@@ -3,8 +3,6 @@
 JADS course JM0211, Process Mining. Group 8's implementation assignment. Repository for the
 team's work and for instructor access.
 
-Contact: Karolin Winter, k.m.winter@tue.nl
-
 ## The assignment
 
 Implement the "Deviation analysis" step from Dees, de Leoni and Mannhardt (2017), *Enhancing
