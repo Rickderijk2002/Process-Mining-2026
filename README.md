@@ -23,6 +23,23 @@ recall.
 
 Full brief: [assignment/description_group8_conformance_checking.pdf](assignment/description_group8_conformance_checking.pdf)
 
+## Team & task division
+
+Four people, one pipeline stage each, so the technical load splits evenly along the steps the
+assignment already defines. Swap in real names once the group locks them in.
+
+| Person | Owns | Short paper section |
+|---|---|---|
+| **Person A** — Data & KPI | Load the XES log and PNML model; compute per-trace throughput time and add it as a log attribute | KPI definition |
+| **Person B** — Alignment & encoding | Generate optimal alignments per trace; encode each trace as model-move / log-move counts per activity | Alignment methodology |
+| **Person C** — Classification | Fit a classification tree on the encoded traces against the throughput-time KPI, with hyperparameter optimization | Modeling |
+| **Person D** — Rules & evaluation | Derive classification rules from the tree, split the log per rule; build the manual gold standard and score precision/recall | Evaluation |
+
+Shared rather than owned by one person: the poster (assembled from all four sections), the
+technology statement, and integration testing before each deadline. The pipeline is
+sequential (B needs A's output, C needs B's, D needs C's), so whoever finishes their stage
+early picks up the next bottleneck rather than sitting idle.
+
 ## Deliverables and dates
 
 | Item | Due |
