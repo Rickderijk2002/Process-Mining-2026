@@ -46,7 +46,9 @@ Within JM0211, neighbouring topics also treat conformance (for example resource 
 The artefact takes as input (i) an event log in XES format and (ii) a Petri net in PNML format. It returns (i) a set of classification rules that relate deviation encodings to the KPI, and (ii) for each rule, the subset of traces that satisfy it. The pipeline has four steps.
 
 ```{mermaid}
-flowchart LR
+%%| fig-width: 4.5
+%%| fig-cap: "Overview of the deviation-analysis pipeline."
+flowchart TB
   A[Event log + Petri net] --> B[Attach KPI]
   B --> C[Align and encode]
   C --> D[Classification tree]
