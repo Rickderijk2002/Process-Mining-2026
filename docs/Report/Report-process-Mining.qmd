@@ -1,0 +1,108 @@
+---
+title: "Conformance Checking for Process Improvement"
+author: "Group 8: Rick de Rijk, Thom Verzantvoort, Stefan Vonk, Tycho van Rooij"
+subtitle: "JM0211 Process Mining"
+format:
+  pdf:
+    include-in-header:
+      text: |
+        \usepackage{placeins}
+geometry:
+  - top=1.5cm
+  - bottom=1.8cm
+  - left=1.8cm
+  - right=1.8cm
+editor: visual
+toc: true
+lof: true
+number-sections: true
+bibliography: references.bib
+link-citations: true
+indent: true
+---
+
+::: callout-note
+## Working draft
+
+Page limit on submission: **5 pages excluding references**. Remove this callout before the final PDF. Section ownership while drafting: Rick = KPI / data step; Stefan = alignment and encoding; classification and rules/evaluation still open between Tycho and Thom.
+:::
+
+\newpage
+
+# Motivation and Scientific Background
+
+Conformance checking compares behaviour allowed by a normative process model with behaviour recorded in an event log [@Song2008; @Aalst16]. Diagnostics can expose control-flow deviations (for example skipped or inserted activities) and, when data attributes are available, violations of data guards. Those discrepancies are often treated as defects. Prior work, however, shows that some deviations are workarounds that coincide with *better* process performance [@Dees2017]. Recognising which deviations help and which hurt is therefore a concrete route to process improvement, not only to compliance reporting.
+
+This assignment implements the **deviation analysis** step of the methodology of Dees, de Leoni and Mannhardt [@Dees2017]: correlate observed deviations with a chosen key performance indicator (KPI), then retain rules that link deviation patterns to KPI outcomes. In the JM0211 group topics, our focus sits with conformance checking (shared with several other groups) but is aimed at *improvement* rather than at resource or temporal conformance alone. Predictive and prescriptive monitoring groups also care about performance; we differ in that we start from alignments against a Petri net and explain KPI variation through deviation features, instead of forecasting the next event or prescribing an action.
+
+The business setting for evaluation is the BPI Challenge 2017 loan-application log (Denied subset) with a provided Petri net. Throughput time of a case is a natural KPI for that domain: faster handling of applications is valuable for both the applicant and the organisation, and it matches the KPI used in the UWV case study of [@Dees2017].
+
+# Conceptual Approach
+
+## Overview
+
+The artefact takes as input (i) an event log in XES format and (ii) a Petri net in PNML format. It returns (i) a set of classification rules that relate deviation encodings to the KPI, and (ii) for each rule, the subset of traces that satisfy it. The pipeline has four steps.
+
+```{mermaid}
+flowchart LR
+  A[Event log + Petri net] --> B[Attach KPI]
+  B --> C[Align and encode]
+  C --> D[Classification tree]
+  D --> E[Rules + trace subsets]
+```
+
+## Step 1 KPI definition and enrichment {#sec:kpi}
+
+**Owner: Rick.**
+
+**KPI.** We use *throughput time* of each trace, following [@Dees2017]: for a trace $\sigma$,
+
+$$
+\kappa(\sigma) = t(\text{last event of }\sigma) - t(\text{first event of }\sigma).
+$$
+
+We store $\kappa(\sigma)$ in **days** (elapsed seconds divided by $86400$) as a case-level attribute named `throughput_time`. Lower values are better. Empty traces are rejected; a missing `time:timestamp` on an event is treated as an error. A single-event case receives throughput $0$.
+
+**Required log characteristics.** The log must provide a clear case notion and an ordered sequence of events with reliable timestamps. Control-flow activity labels are required for later alignment; resources are not required for this KPI step. The Petri net must be the normative model against which alignments will be computed in the next step.
+
+**Output of this step.** The same event log, enriched with `throughput_time` on every case (optionally exported as a new XES file). No parameters beyond optional subsampling for development speed.
+
+## Step 2 Alignment and encoding
+
+**Owner: Stefan.**
+
+For each trace, compute an optimal alignment with the Petri net. Encode each trace by counting, per activity $a_i$, the number of model moves and the number of log moves. This yields two features per activity [@Dees2017].
+
+## Step 3 Classification
+
+**Owner: Tycho or Thom (not yet assigned).**
+
+Train a classification tree on the encoded traces, using `throughput_time` as the dependent variable. Use standard hyperparameter search to select a well-performing tree. *Note:* if the KPI is kept continuous, a regression tree may be the direct analogue of [@Dees2017]; if the course brief is read strictly as a *classification* tree, the KPI must be discretised (for example by a threshold). The group should lock that choice before modelling.
+
+## Step 4 Rules and log split
+
+**Owner: Tycho or Thom (not yet assigned).**
+
+Derive classification rules from the tree and split the original log so that each rule maps to a compliant subset of traces. These subsets are the second required artefact output.
+
+# Implementation
+
+**Rick (done in code).** Python 3 with `pm4py` loads the XES log and PNML net. A small module computes and attaches `throughput_time`, with a CLI entry point (`main.py`) supporting `--sample` and optional `--export` of an enriched XES. Paths are relative to the project root.
+
+**Stefan, Tycho, Thom.** *To be filled:* alignment API, encoding schema, scikit-learn tree setup, rule extraction, and how to reproduce evaluation scores from the repository README.
+
+# Evaluation Design and Results
+
+**Owner: Tycho or Thom (lead once assigned), with group input.**
+
+The brief requires a manually built gold standard and at least precision and recall for (1) optimal alignments per trace and (2) the recovered classification rules. Dataset: BPI Challenge 2017 (Denied) as provided with the assignment; a sample may be used during development, with final numbers on the full log.
+
+*Results and figures: pending implementation of steps 2 to 4.*
+
+# Limitations and Future Work
+
+**KPI step.** Throughput time uses only the first and last timestamps. It ignores waiting-time structure inside the case, calendar effects, and unfinished cases that might appear in a broader log. Discretising the KPI for a classification tree (if required) throws away magnitude information that a regression tree would keep [@Dees2017].
+
+**Broader approach.** Further limitations of alignments, tree stability, and gold-standard construction will be added once those stages exist. Future work suggested by [@Dees2017] includes multi-KPI improvement and incorporating only legally admissible repairs; those sit outside our implemented deviation-analysis scope but remain relevant for process improvement.
+
+# References
