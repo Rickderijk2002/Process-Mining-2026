@@ -6,3 +6,7 @@ __pycache__/
 
 data/raw/*
 !data/raw/.gitkeep
+
+# Quarto intermediates (keep .qmd and final .pdf)
+docs/Report/*.tex
+docs/Report/*_files/
