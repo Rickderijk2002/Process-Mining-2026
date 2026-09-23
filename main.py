@@ -1,7 +1,5 @@
 """
-Entry point for Person A: load data, attach throughput_time, optional XES export.
-
-Example:
+Example run command:
   uv run python main.py --sample 50 --export data/raw/enriched_sample.xes
 """
 
@@ -12,9 +10,10 @@ import statistics
 from pathlib import Path
 
 from data_kpi import DataLoader, ThroughputTimeEnricher, THROUGHPUT_ATTR
+from alignment import Aligner, AlignmentBatch, Encoder
 
 
-def main() -> None:
+def main() -> AlignmentBatch:
     args = _parse_args()
     loader = DataLoader()
     enricher = ThroughputTimeEnricher(attribute_name=THROUGHPUT_ATTR)
@@ -27,6 +26,16 @@ def main() -> None:
 
     enricher.enrich(log)
 
+    activities = Encoder.activities_from_model(net)
+    alignment_batch = Aligner.align_log(
+        log,
+        net,
+        initial_marking,
+        final_marking,
+        activities,
+    )
+    encodings_df = alignment_batch.encodings
+
     values = [float(trace.attributes[THROUGHPUT_ATTR]) for trace in log]
     print(f"traces:              {len(log)}")
     print(f"petri places/trans:  {len(net.places)}/{len(net.transitions)}")
@@ -35,11 +44,10 @@ def main() -> None:
     print(f"throughput median:   {statistics.median(values):.4f}")
     print(f"throughput max:      {max(values):.4f}")
     print(f"negative values:     {sum(1 for v in values if v < 0)}")
+    print(f"alignment activities: {len(activities)}")
+    print(f"encoding features:    {len(activities) * 2}")
+    print(f"encodings dataframe:   {encodings_df.head(5)}")
 
-    # Spot-check: first case, recompute from raw timestamps.
-    first = log[0]
-    case_id = first.attributes.get("concept:name", "<unknown>")
-    print(f"spot-check case:     {case_id} -> {first.attributes[THROUGHPUT_ATTR]:.4f} days")
 
     if args.export:
         export_path = Path(args.export)
@@ -47,8 +55,7 @@ def main() -> None:
         enricher.export_xes(log, str(export_path))
         print(f"exported:            {export_path}")
 
-    # Keep markings available so a later stage can import this module without reloading.
-    _ = (initial_marking, final_marking)
+    return alignment_batch
 
 
 def _parse_args() -> argparse.Namespace:
