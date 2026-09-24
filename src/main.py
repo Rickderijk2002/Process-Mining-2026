@@ -48,7 +48,6 @@ def main() -> AlignmentBatch:
     print(f"encoding features:    {len(activities) * 2}")
     print(f"encodings dataframe:   {encodings_df.head(5)}")
 
-
     if args.export:
         export_path = Path(args.export)
         export_path.parent.mkdir(parents=True, exist_ok=True)
