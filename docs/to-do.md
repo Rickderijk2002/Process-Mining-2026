@@ -14,11 +14,11 @@ The code already covers the first two pipeline steps. Finish the checks around t
 
 - [x] **Toy for the alignment script.** A net with a few activities, one silent transition, and a handful of short traces. Write the model-move and log-move counts by hand. Run `alignment_encoding.py` on that toy. Precision and recall against your counts are the alignment gold standard. Do this before the long run, so a counting bug is fixed while the example still fits on a page.
 
-- [ ] **Encoding table for the real log.** Run the same script on a sample, then on all 3,093 cases. Save the dataframe (`case_id`, `throughput_time`, and the move counts). That file is the input to the tree. While doing this, align the log in one call rather than one trace at a time, or the full run will be unnecessarily slow.
+- [x] **Encoding table for the real log.** Run the same script on a sample, then on all 3,093 cases. Save the dataframe (`case_id`, `throughput_time`, and the move counts). That file is the input to the tree. While doing this, align the log in one call rather than one trace at a time, or the full run will be unnecessarily slow.
 
-- [ ] **Toy for the rules.** You can reuse the alignment toy. Give the short traces a throughput you chose, and write down the rule and the case list yourself. After the tree code exists, run it on this toy and score precision and recall against that list. This checks rule extraction, which the alignment toy does not check.
+- [x] **Toy for the rules.** You can reuse the alignment toy. Give the short traces a throughput you chose, and write down the rule and the case list yourself. After the tree code exists, run it on this toy and score precision and recall against that list. This checks rule extraction, which the alignment toy does not check.
 
-- [ ] **Tree on the loan log.** Split off a held-out set. Fit a classification tree on the rest, with a hyperparameter search. Read each leaf as a rule and list the matching applications. On the held-out cases, precision and recall compare the predicted class with the class from the cutoff.
+- [x] **Tree on the loan log.** Split off a held-out set. Fit a classification tree on the rest, with a hyperparameter search. Read each leaf as a rule and list the matching applications. On the held-out cases, precision and recall compare the predicted class with the class from the cutoff.
 
 - [ ] **Write up the same numbers.** The short paper gets the KPI definition, the encoding, the tree settings, the rules, and both sets of scores. The poster is that story in brief. The README lists the commands that reproduce the scores, in order, and `requirements.txt` lists the libraries.
 

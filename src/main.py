@@ -1,6 +1,6 @@
 """
 Example run command:
-  uv run python src/main.py --sample 50 --export data/output/enriched_sample.xes
+  uv run python src/main.py --cutoff 14 --sample 50 --export data/output/enriched_sample.xes
 """
 
 from __future__ import annotations
@@ -10,6 +10,14 @@ import statistics
 from pathlib import Path
 
 from alignment import Aligner, AlignmentBatch, Encoder
+from classification import (
+    BAD,
+    GOOD,
+    DeviationTree,
+    label_throughput,
+    rules_to_case_frame,
+    rules_to_frame,
+)
 from data_kpi import THROUGHPUT_ATTR, DataLoader, ThroughputTimeEnricher
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -61,7 +69,35 @@ def main() -> AlignmentBatch:
         enricher.export_xes(log, str(export_path))
         print(f"exported:            {export_path}")
 
+    _fit_and_store_rules(encodings_df, args)
     return alignment_batch
+
+
+def _fit_and_store_rules(encodings_df, args: argparse.Namespace) -> None:
+    labels = label_throughput(encodings_df[THROUGHPUT_ATTR], args.cutoff)
+    result = DeviationTree(
+        random_state=args.random_state,
+        test_size=args.test_size,
+    ).fit(encodings_df, args.cutoff, holdout=True, search=True)
+
+    rules_path = _resolve(args.rules)
+    rules_path.parent.mkdir(parents=True, exist_ok=True)
+    rules_to_frame(result.rules).to_csv(rules_path, index=False)
+
+    cases_path = _resolve(args.export_cases)
+    cases_path.parent.mkdir(parents=True, exist_ok=True)
+    rules_to_case_frame(result.rules).to_csv(cases_path, index=False)
+
+    n_good = int((labels == GOOD).sum())
+    n_bad = int((labels == BAD).sum())
+    print(f"cutoff days:          {args.cutoff}")
+    print(f"class balance:        good={n_good} bad={n_bad}")
+    print(f"best params:          {result.best_params}")
+    print(f"held-out precision:   {result.held_out_precision}")
+    print(f"held-out recall:      {result.held_out_recall}")
+    print(f"rules:                {len(result.rules)}")
+    print(f"wrote rules:          {rules_path}")
+    print(f"wrote cases:          {cases_path}")
 
 
 def _resolve(path: str) -> Path:
@@ -73,7 +109,10 @@ def _resolve(path: str) -> Path:
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Attach throughput time, align traces, and write the encoding table."
+        description=(
+            "Attach throughput time, align traces, fit the deviation tree, "
+            "and write the rules."
+        )
     )
     parser.add_argument(
         "--log",
@@ -92,9 +131,37 @@ def _parse_args() -> argparse.Namespace:
         help="Only use the first N traces (fast path while developing).",
     )
     parser.add_argument(
+        "--cutoff",
+        type=float,
+        required=True,
+        help="Throughput cutoff in days. Cases at or below are good.",
+    )
+    parser.add_argument(
         "--export-encodings",
         default="data/output/alignment_encodings.csv",
         help="Path for the alignment encoding table (relative to the project root).",
+    )
+    parser.add_argument(
+        "--rules",
+        default="data/output/tree_rules.csv",
+        help="Path for the leaf-rule table (relative to the project root).",
+    )
+    parser.add_argument(
+        "--export-cases",
+        default="data/output/tree_rule_cases.csv",
+        help="Path for rule_id,case_id rows (relative to the project root).",
+    )
+    parser.add_argument(
+        "--test-size",
+        type=float,
+        default=0.25,
+        help="Held-out fraction for evaluation.",
+    )
+    parser.add_argument(
+        "--random-state",
+        type=int,
+        default=0,
+        help="Random seed for the train/test split and the tree.",
     )
     parser.add_argument(
         "--export",
