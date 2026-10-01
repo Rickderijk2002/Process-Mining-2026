@@ -46,9 +46,7 @@ def main() -> None:
 
     encodings["throughput_time"] = encodings["case_id"].map(THROUGHPUT)
     if encodings["throughput_time"].isna().any():
-        missing = encodings.loc[
-            encodings["throughput_time"].isna(), "case_id"
-        ].tolist()
+        missing = encodings.loc[encodings["throughput_time"].isna(), "case_id"].tolist()
         raise ValueError(f"missing planted throughput for cases: {missing}")
 
     result = DeviationTree().fit(

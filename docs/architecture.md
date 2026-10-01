@@ -76,6 +76,8 @@ These check a stage or inspect the log. They are not on the path of `src/main.py
 | `docs/pipeline.md` | What the five steps compute. |
 | `docs/architecture.md` | This map. |
 | `docs/notes.md` | Working notes on the assignment and the toy. |
+| `docs/toy.md` | The five-trace example: the hand counts and the recovered rule. |
+| `docs/handoff-tycho.md` | What is already running, and the cutoff, scores, and rules still to interpret. |
 | `docs/to-do.md` | Work order for the remaining checks. |
 | `docs/resources/` | Assignment brief, rubric, and the paper and poster templates. |
 | `docs/Report/` | The short-paper draft. |
