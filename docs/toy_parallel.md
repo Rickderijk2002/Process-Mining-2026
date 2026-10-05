@@ -97,7 +97,17 @@ Same rules as `docs/toy.md`:
 
 ## What we do **not** do yet
 
-- No planted throughput / rule check on this toy yet (optional, same idea as `check_toy_rules.py`).
+- Nothing blocking for Rick’s gold lane. Optional extras only if you want more practise.
+
+## Optional: planted rule (practise)
+
+```bash
+uv run python scripts/check_toy_parallel_rules.py
+```
+
+Cutoff **10**. Only **p4** is slow (25 days). Hand rule: **extra B** (`log_move_B ≥ 1`) → bad.
+p3 still *deviates* (missing C) but stays **good** — deviation ≠ slow. Expect P/R **1.0** and a
+depth-1 split on `log_move_B` (same *kind* of story as the linear toy).
 
 ## SimPN export spike (Step 1b)
 
