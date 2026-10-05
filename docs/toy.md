@@ -2,12 +2,15 @@
 
 The loan log is too long to replay by hand. This toy is five short traces on a net you can draw on a page. You write the move counts and the slow cases yourself, then run the same scripts. If the scripts return that page, the encoding and the rule extraction match the definitions. The toy is not the bank, and its rule is not a finding about the bank.
 
-Two commands produce the two outputs below.
+Three commands produce the outputs below.
 
 ```bash
 uv run python scripts/align_toy.py
+uv run python scripts/evaluate_toy_alignments.py
 uv run python scripts/check_toy_rules.py
 ```
+
+`evaluate_toy_alignments.py` compares the aligner to the hand answer key in `data/gold/toy_alignment_gold.csv` and writes a side-by-side plot to `data/output/toy_alignment_gold_vs_pred.png`.
 
 `scripts/make_toy.py` writes the net and the log to `data/raw/toy.pnml` and `data/raw/toy.xes`. The traces have activity names and no timestamps, so the alignment table has no throughput yet. The rule script fills the throughput in afterwards.
 
