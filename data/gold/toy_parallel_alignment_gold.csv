@@ -1,0 +1,7 @@
+case_id,model_move_A,model_move_B,model_move_C,model_move_D,model_move_E,model_move_F,log_move_A,log_move_B,log_move_C,log_move_D,log_move_E,log_move_F
+p1,0,0,0,0,0,0,0,0,0,0,0,0
+p2,0,0,0,0,0,0,0,0,0,0,0,0
+p3,0,0,1,0,0,0,0,0,0,0,0,0
+p4,0,0,0,0,0,0,0,1,0,0,0,0
+p5,0,0,0,0,0,1,0,0,0,0,0,0
+p6,0,0,0,0,0,0,1,0,0,0,0,0

@@ -17,7 +17,7 @@ Pruning will probably change the locked result (20 rules, precision 0.62, recall
 * \[Stefan] Update `locked\_results` and `derived\_rulesets`, since the old rule stories belong to the old 20 rules. 
 * \[Stefan] Rerun the stability check on the new grid.
 * \[Tycho] Compare multiple cutoffs (14, 21, maybe 10 and 28), each against its own all-bad baseline.
-* \[Rick] Gold standard script for the alignments: toy counts in a CSV, precision and recall computed from it.
+* \[Rick] Gold standard script for the alignments: toy counts in a CSV, precision and recall computed from it. **Done** for the linear toy (`data/gold/toy_alignment_gold.csv`, `scripts/evaluate_toy_alignments.py`). Second toy design in progress: `docs/toy_parallel.md` (Step 0).
 * \[Tycho] Agree who owns evaluation (me or Thom).
 * \[ ] Find the technology statement requirements on Canvas (skipping it fails the assignment).
 * \[Tycho] Draft my paper sections (classification, evaluation).
