@@ -97,9 +97,24 @@ Same rules as `docs/toy.md`:
 
 ## What we do **not** do yet
 
-- No SimPN export spike yet (Step 1b): confirm SimPN can emit a log we convert to XES; PNML may stay pm4py-authored.
 - No planted throughput / rule check on this toy yet (optional, same idea as `check_toy_rules.py`).
 
-## Your check after running Step 1
+## SimPN export spike (Step 1b)
 
-Expect `cases exact match: 6 / 6` and precision/recall `1.0`. Open the plot under `data/output/toy_parallel_alignment_gold_vs_pred.png`: left and right panels must match.
+Run:
+
+```bash
+uv run python scripts/spike_simpn_export.py
+```
+
+**Result of the spike:**
+
+| Question | Answer |
+| -------- | ------ |
+| Can SimPN write an event log? | **Yes.** `EventLogReporter` → CSV (`case_id`, `task`, `resource`, `start_time`, `completion_time`). |
+| Parallelism visible in the log? | **Yes.** B and C share the same start time on a case (AND split). |
+| XOR visible? | **Yes.** Each case takes D or E, not both. |
+| Direct PNML export? | **No usable API.** Keep `make_toy_parallel.py` (pm4py) as the model file for alignments. |
+| Path into our pipeline? | CSV → filter A–F → XES (`data/output/simpn_spike_events.xes`). Fitting traces only; deviant cases stay hand-written in the gold XES. |
+
+So: SimPN is useful as a **fitting-log generator**. The **gold net (PNML)** and the **deviant cases** stay under our control, as in Step 1.
