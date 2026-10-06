@@ -20,6 +20,7 @@ POSITIVE_CLASS = BAD
 DEFAULT_PARAM_GRID = {
     "max_depth": [2, 3, 4, 5],
     "min_samples_leaf": [5, 10, 20],
+    "ccp_alpha": [0.0, 0.001, 0.01, 0.1],
 }
 
 F1_SCORER = make_scorer(f1_score, pos_label=POSITIVE_CLASS)
@@ -168,7 +169,7 @@ class DeviationTree:
                 random_state=self.random_state,
             )
             estimator.fit(x_fit, y_fit)
-            best_params = {"max_depth": depth}
+            best_params = {"max_depth": depth, "ccp_alpha": 0.0}
 
         held_out_precision: float | None = None
         held_out_recall: float | None = None

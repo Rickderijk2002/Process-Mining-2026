@@ -1,0 +1,3 @@
+rule_id,predicted_class,conditions,n_cases,n_good,n_bad,share_bad
+0,good,log_move_W-Call-after-offers-suspend <= 0.5,389,327,62,0.1594
+1,bad,log_move_W-Call-after-offers-suspend > 0.5,2704,1174,1530,0.5658
