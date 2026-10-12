@@ -46,3 +46,18 @@ balanced,21,7,bad,log_move_W-Call-after-offers-suspend > 0.5 AND log_move_O-Crea
 balanced,21,8,bad,log_move_W-Call-after-offers-suspend > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Validate-application-schedule <= 0.5,536,354,182,0.3396
 balanced,21,9,bad,log_move_W-Call-after-offers-suspend > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Validate-application-schedule > 0.5,29,8,21,0.7241
 balanced,21,10,bad,log_move_W-Call-after-offers-suspend > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused > 2.5,113,45,68,0.6018
+searched,14,0,good,log_move_W-Call-after-offers-suspend <= 0.5,389,327,62,0.1594
+searched,14,1,bad,log_move_W-Call-after-offers-suspend > 0.5,2704,1174,1530,0.5658
+searched,18,0,good,log_move_W-Call-after-offers-suspend <= 0.5,389,355,34,0.0874
+searched,18,1,bad,log_move_W-Call-after-offers-suspend > 0.5,2704,1704,1000,0.3698
+searched,21,0,good,log_move_W-Call-after-offers-suspend <= 0.5 AND model_move_W-Handle-leads-suspend <= 0.5 AND model_move_W-Call-incomplete-files-ate-abort <= 0.5 AND log_move_W-Validate-application-suspend <= 1.5,263,257,6,0.0228
+searched,21,1,good,log_move_W-Call-after-offers-suspend <= 0.5 AND model_move_W-Handle-leads-suspend <= 0.5 AND model_move_W-Call-incomplete-files-ate-abort <= 0.5 AND log_move_W-Validate-application-suspend > 1.5,62,55,7,0.1129
+searched,21,2,good,log_move_W-Call-after-offers-suspend <= 0.5 AND model_move_W-Handle-leads-suspend <= 0.5 AND model_move_W-Call-incomplete-files-ate-abort > 0.5,28,23,5,0.1786
+searched,21,3,good,log_move_W-Call-after-offers-suspend <= 0.5 AND model_move_W-Handle-leads-suspend > 0.5,36,29,7,0.1944
+searched,21,4,bad,log_move_W-Call-after-offers-suspend > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Complete-application-suspend <= 0.5 AND log_move_W-Validate-application-start <= 0.5,1201,880,321,0.2673
+searched,21,5,bad,log_move_W-Call-after-offers-suspend > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Complete-application-suspend <= 0.5 AND log_move_W-Validate-application-start > 0.5,32,18,14,0.4375
+searched,21,6,good,log_move_W-Call-after-offers-suspend > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Complete-application-suspend > 0.5 AND log_move_W-Assess-potential-fraud-resume <= 0.5,759,637,122,0.1607
+searched,21,7,bad,log_move_W-Call-after-offers-suspend > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Complete-application-suspend > 0.5 AND log_move_W-Assess-potential-fraud-resume > 0.5,34,20,14,0.4118
+searched,21,8,bad,log_move_W-Call-after-offers-suspend > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Validate-application-schedule <= 0.5,536,354,182,0.3396
+searched,21,9,bad,log_move_W-Call-after-offers-suspend > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Validate-application-schedule > 0.5,29,8,21,0.7241
+searched,21,10,bad,log_move_W-Call-after-offers-suspend > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused > 2.5,113,45,68,0.6018

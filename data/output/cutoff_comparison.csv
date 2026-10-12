@@ -1,7 +1,10 @@
-variant,cutoff,slow_share,baseline_prec,params,depth,rules,slow_rules,test_prec,test_rec,test_f1
-unweighted,14,0.515,0.515,"{'ccp_alpha': 0.01, 'max_depth': 2, 'min_samples_leaf': 5}",1,2,1,0.563,0.97,0.712
-unweighted,18,0.334,0.334,"{'ccp_alpha': 0.0, 'max_depth': 5, 'min_samples_leaf': 20}",5,22,7,0.639,0.151,0.244
-unweighted,21,0.248,0.248,"{'ccp_alpha': 0.001, 'max_depth': 4, 'min_samples_leaf': 5}",4,8,4,0.58,0.151,0.24
-balanced,14,0.515,0.515,"{'ccp_alpha': 0.01, 'class_weight': 'balanced', 'max_depth': 2, 'min_samples_leaf': 5}",1,2,1,0.563,0.97,0.712
-balanced,18,0.334,0.334,"{'ccp_alpha': 0.01, 'class_weight': 'balanced', 'max_depth': 2, 'min_samples_leaf': 5}",1,2,1,0.381,0.985,0.549
-balanced,21,0.248,0.248,"{'ccp_alpha': 0.001, 'class_weight': 'balanced', 'max_depth': 4, 'min_samples_leaf': 10}",4,11,6,0.337,0.854,0.484
+variant,cutoff,slow_share,baseline_prec,baseline_f1,n_seeds,prec_mean,prec_sd,rec_mean,rec_sd,f1_mean,f1_sd,rules_mean,rules_min,rules_max,balanced_picked
+unweighted,14,0.515,0.515,0.68,4,0.582,0.019,0.855,0.133,0.688,0.03,7.25,2,14,0
+unweighted,18,0.334,0.334,0.501,4,0.483,0.104,0.171,0.046,0.247,0.042,12.25,4,22,0
+unweighted,21,0.248,0.248,0.397,4,0.608,0.021,0.133,0.02,0.217,0.027,11.0,8,18,0
+balanced,14,0.515,0.515,0.68,4,0.584,0.023,0.848,0.141,0.687,0.032,7.0,2,13,4
+balanced,18,0.334,0.334,0.501,4,0.403,0.016,0.826,0.106,0.54,0.009,8.0,2,12,4
+balanced,21,0.248,0.248,0.397,4,0.32,0.014,0.814,0.03,0.46,0.018,12.25,11,14,4
+searched,14,0.515,0.515,0.68,4,0.584,0.023,0.848,0.141,0.687,0.032,7.0,2,13,2
+searched,18,0.334,0.334,0.501,4,0.403,0.016,0.826,0.106,0.54,0.009,8.0,2,12,4
+searched,21,0.248,0.248,0.397,4,0.32,0.014,0.814,0.03,0.46,0.018,12.25,11,14,4
