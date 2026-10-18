@@ -24,7 +24,7 @@ indent: true
 ::: callout-note
 ## Working draft
 
-Page limit on submission: **5 pages excluding references**. Remove this callout before the final PDF. Section ownership while drafting: Rick = KPI / data step; Stefan = alignment and encoding; classification and rules/evaluation still open between Tycho and Thom.
+Page limit on submission: **5 pages excluding references**. Remove this callout before the final PDF. Section ownership while drafting: Rick = Conceptual Approach (methodology) and Implementation; Tycho = literature, evaluation and results.
 :::
 
 \newpage
@@ -37,76 +37,97 @@ Deviations from a normative process model are not necessarily associated with po
 
 This assignment implements the deviation analysis component of this methodology rather than the complete model repair procedure. For each case, optimal alignments against a Petri net are used to derive deviation features, which are related to case throughput time. Throughput time is defined as the elapsed time between the first and last event of a trace, following the KPI definition used in the UWV case study of Dees et al. [@Dees2017].
 
-Within JM0211, neighbouring topics also treat conformance (for example resource or temporal diagnostics) or process performance via predictive and prescriptive monitoring; our topic differs by linking alignment-based deviation features to a case-level KPI specifically for process improvement.
+Within JM0211, neighbouring topics also treat conformance (for example resource or temporal diagnostics) or process performance via predictive and prescriptive monitoring; this topic differs by linking alignment-based deviation features to a case-level KPI specifically for process improvement.
 
 # Conceptual Approach
 
 ## Overview
 
-The artefact takes as input (i) an event log in XES format and (ii) a Petri net in PNML format. It returns (i) a set of classification rules that relate deviation encodings to the KPI, and (ii) for each rule, the subset of traces that satisfy it. The pipeline has four steps.
+The artefact implements the deviation analysis step of Dees et al. [@Dees2017]. It takes an event log in XES format and a Petri net in PNML format as input. The log must provide a case notion, an activity label for every event and a reliable timestamp for every event, because both the throughput time and the alignments depend on them. Resources and further attributes are not used. The Petri net is the normative model against which the log is compared. The artefact returns a set of classification rules that relate deviations to throughput time, together with the traces of the log that satisfy each rule.
+
+@fig-pipeline shows the four steps, which the following subsections describe in order: the KPI, the alignment and encoding, the classification tree and the rule extraction. The parameters are the throughput cutoff (required), the hold-out fraction, the random seed and an optional sample size for development. The correctness of the implementation is tested against hand-built gold standards, which Section @sec-evaluation describes.
 
 ```{mermaid}
-%%| fig-width: 4.5
-%%| fig-cap: "Overview of the deviation-analysis pipeline."
-flowchart TB
-  A[Event log + Petri net] --> B[Attach KPI]
-  B --> C[Align and encode]
-  C --> D[Classification tree]
-  D --> E[Rules + trace subsets]
+%%| label: fig-pipeline
+%%| fig-width: 6.5
+%%| fig-cap: "The artefact turns a log and a model into rules in four steps."
+flowchart LR
+  A["Log (XES)<br/>+ net (PNML)"] --> B["1 KPI<br/>per trace"]
+  B --> C["2 Align<br/>and encode"]
+  C --> D["3 Classification<br/>tree"]
+  D --> E["4 Rules<br/>+ trace sets"]
 ```
 
-## Step 1 KPI definition and enrichment {#sec:kpi}
+<!-- RICK: figure kept deliberately small. A second panel with the alignment example (@tbl-align) could sit beside it if space allows. -->
 
-**Owner: Rick.**
+## Step 1: KPI definition and enrichment {#sec-kpi}
 
-**KPI.** We use *throughput time* of each trace, following [@Dees2017]: for a trace $\sigma$,
+The first step attaches a key performance indicator (KPI) to every trace, so that deviations can later be related to how long a case takes. The brief prescribes throughput time. For a trace $\sigma$, it is the elapsed time between the first and the last event [@Dees2017]:
 
 $$
 \kappa(\sigma) = t(\text{last event of }\sigma) - t(\text{first event of }\sigma).
 $$
 
-We store $\kappa(\sigma)$ in **days** (elapsed seconds divided by $86400$) as a case-level attribute named `throughput_time`. Lower values are better. Empty traces are rejected; a missing `time:timestamp` on an event is treated as an error. A single-event case receives throughput $0$.
+The artefact stores $\kappa(\sigma)$ in days as the case attribute `throughput_time`, and lower values are better. The implementation takes the earliest and the latest timestamp of the trace, which equals the definition for chronologically ordered traces. An empty trace or an event without timestamp raises an error, and a trace with a single event receives a throughput time of zero.
 
-**Required log characteristics.** The log must provide a clear case notion and an ordered sequence of events with reliable timestamps. Control-flow activity labels are required for later alignment; resources are not required for this KPI step. The Petri net must be the normative model against which alignments will be computed in the next step.
+## Step 2: Alignment and encoding
 
-**Output of this step.** The same event log, enriched with `throughput_time` on every case (optionally exported as a new XES file). No parameters beyond optional subsampling for development speed.
+The second step measures how each trace deviates from the Petri net. An alignment maps a trace onto a run of the net, and every position of the alignment is a synchronous move, a log move or a model move. A synchronous move is an activity that the trace and the model perform together. A log move is an activity that the trace contains and the model does not allow at that point. A model move is an activity that the model requires and the trace lacks [@Aalst16]. @tbl-align shows the three move types for a short trace.
 
-## Step 2 Alignment and encoding
+| Position | 1 | 2 | 3 | 4 |
+|---|---|---|---|---|
+| Trace | A | A | $\gg$ | C |
+| Model | A | $\gg$ | B | C |
+| Move | synchronous | log move A | model move B | synchronous |
 
-**Owner: Stefan.**
+: Log moves and model moves arise where a trace and the model disagree. The table shows one alignment of the trace A, A, C against the model A, B, C, in which the symbol $\gg$ marks a skipped position. {#tbl-align}
 
-For each trace, compute an optimal alignment with the Petri net. Encode each trace by counting, per activity $a_i$, the number of model moves and the number of log moves. This yields two features per activity [@Dees2017].
+An alignment is optimal when it has the minimal number of deviations on visible transitions, and moves on silent transitions do not count [@Dees2017]. PM4Py realises this with its default cost function and the state-equation A\* solver: synchronous moves cost 0, log moves and model moves on visible activities cost 10000 each, and moves on silent transitions cost 1, which serves only as a tie-breaker. A trace can have several optimal alignments, and the solver returns one of them. Dees et al. argue that this choice does not affect the applicability of the methodology when the log contains many traces [@Dees2017]. Section @sec-limitations returns to this assumption.
 
-## Step 3 Classification
+<!-- RICK: PM4Py citation to be added by Tycho (literature owner). -->
 
-**Owner: Tycho or Thom (not yet assigned).**
+Each alignment is then encoded as a vector of counts. For each of the 54 visible activities of the net, one feature records the number of model moves and one the number of log moves of that activity, as the brief specifies. This gives 108 features per trace. Dees et al. exclude the activities that analysts declare disallowed or mandatory from these features [@Dees2017], but the brief provides no such constraints, so all activities are used. An activity is an event name including its lifecycle suffix, for example `W-Call-after-offers-suspend`. Synchronous moves are not features, because they carry no deviation. Silent transitions are not features either, because they never appear in the log. The counts replace the activity sequence as representation, since the 3,093 traces contain 2,038 distinct sequences and the sequence itself is therefore an unsuitable feature.
 
-Train a classification tree on the encoded traces, using `throughput_time` as the dependent variable. Use standard hyperparameter search to select a well-performing tree. *Note:* if the KPI is kept continuous, a regression tree may be the direct analogue of [@Dees2017]; if the course brief is read strictly as a *classification* tree, the KPI must be discretised (for example by a threshold). The group should lock that choice before modelling.
+## Step 3: Classification
 
-## Step 4 Rules and log split
+The third step relates the encoded deviations to the KPI with a classification tree. Dees et al. use a classification tree for discrete KPI values and a regression tree for numeric ones [@Dees2017]. The brief asks for a classification tree, so the throughput time is discretised: a trace is slow if its throughput time exceeds a cutoff of 14 days, and fast otherwise. The cutoff plays the role of the set of satisfactory KPI values in Dees et al., who accept every duration below 8 days in their UWV case study [@Dees2017]. It lies close to the median of 14.43 days and yields 1,501 fast and 1,592 slow traces. It was fixed before any tree was fitted, so it does not depend on model scores. The discretisation discards the magnitude of the throughput time, which a regression tree would retain.
 
-**Owner: Tycho or Thom (not yet assigned).**
+The tree is fitted on a stratified random sample of 75 percent of the traces, and the remaining 25 percent is held out for evaluation. A grid search with five-fold cross-validation on the training part selects the maximum depth (2 to 5), the minimum leaf size (5, 10 or 20) and the cost-complexity pruning parameter (0, 0.001, 0.01 or 0.1). This gives 48 combinations, and the grid was fixed before any scores were inspected. The selection criterion is the F1 score of the slow class. Pruning limits the number of rules. Unpruned trees produced at least twenty rules, which is too many to interpret.
 
-Derive classification rules from the tree and split the original log so that each rule maps to a compliant subset of traces. These subsets are the second required artefact output.
+<!-- RICK: Stefan owns the pruning decision. Confirm the last two sentences of the paragraph above. -->
+
+## Step 4: Rules and trace subsets
+
+The fourth step reads the fitted tree as rules. Every path from the root to a leaf is a conjunction of threshold conditions on move counts, and each leaf is one rule. The counts are integers, so a condition such as `log_move_X <= 0.5` means that activity X never occurs as a log move, and `log_move_X > 0.5` means that it occurs at least once. A rule predicts the class that the tree assigns to its leaf. For each rule, the artefact lists the identifiers of all traces that satisfy its conditions, including those whose actual class differs from the predicted one. Dees et al. keep only correctly classified traces in a cluster [@Dees2017]. The rules and trace lists cover all 3,093 traces, whereas precision and recall are computed on the hold-out set only.
+
+<!-- RICK: the brief asks for "a subset of traces from the original log which are compliant with the rule" and does not name a file format. The trace lists are a CSV of rule and case identifiers. Confirm with Karolin at the 26 October office hour that this satisfies "split the log accordingly". -->
 
 # Implementation
 
-**Rick (done in code).** Python 3 with `pm4py` loads the XES log and PNML net. A small module computes and attaches `throughput_time`, with a CLI entry point (`main.py`) supporting `--sample` and optional `--export` of an enriched XES. Paths are relative to the project root.
+The artefact is implemented in Python 3.12 and organised in three packages that mirror the pipeline: data loading with KPI enrichment, alignment with encoding, and classification with rule extraction. PM4Py (version 2.7.23.8) loads the XES log and the PNML net and computes the alignments. The package pandas holds the encoding table, and scikit-learn fits the tree and performs the grid search. A single entry point, `src/main.py`, runs all four steps. It requires the cutoff in days and accepts the hold-out fraction, the random seed, an optional sample size and the output paths as optional parameters. The random seed defaults to 0, so that a run is reproducible. The program writes the encoding table, the rule table and the rule-to-trace assignments as CSV files, and it can export the log enriched with throughput time as XES. All paths are relative to the project root, and `requirements.txt` pins the dependencies. Scripts in the `scripts` directory generate the two toy logs and nets and compare their alignments and rules with the hand-written gold standards.
 
-**Stefan, Tycho, Thom.** *To be filled:* alignment API, encoding schema, scikit-learn tree setup, rule extraction, and how to reproduce evaluation scores from the repository README.
+<!-- RICK: exact run commands for reproducing the evaluation follow from the README, which is written last. -->
 
-# Evaluation Design and Results
+# Evaluation Design and Results {#sec-evaluation}
 
 **Owner: Tycho or Thom (lead once assigned), with group input.**
 
 The brief requires a manually built gold standard and at least precision and recall for (1) optimal alignments per trace and (2) the recovered classification rules. Dataset: BPI Challenge 2017 (Denied) as provided with the assignment; a sample may be used during development, with final numbers on the full log.
 
-*Results and figures: pending implementation of steps 2 to 4.*
+## Gold standards for alignments and rules
 
-# Limitations and Future Work
+The correctness of the alignments and the rules is tested against gold standards built by hand, because the traces of the real log are too long to align manually. Two small logs with their nets serve this purpose: a linear net with five traces, and a net with six traces that adds a parallel block and an exclusive choice. The correct move counts of every trace were derived by hand before the artefact was run. For the rules, the throughput times of selected traces were planted so that one deviation separates slow from fast traces, and the recovered trace sets are compared with the planted ones. Both toys reproduce the hand-derived move counts exactly (5 of 5 and 6 of 6 traces), and both planted rules are recovered with precision and recall of 1.0.
 
-**KPI step.** Throughput time uses only the first and last timestamps. It ignores waiting-time structure inside the case, calendar effects, and unfinished cases that might appear in a broader log. Discretising the KPI for a classification tree (if required) throws away magnitude information that a regression tree would keep [@Dees2017].
+*Results and figures on the real log: pending (Tycho).*
 
-**Broader approach.** Further limitations of alignments, tree stability, and gold-standard construction will be added once those stages exist. Future work suggested by [@Dees2017] includes multi-KPI improvement and incorporating only legally admissible repairs; those sit outside our implemented deviation-analysis scope but remain relevant for process improvement.
+# Limitations and Future Work {#sec-limitations}
+
+The approach has several design limitations. Discretising throughput time at one cutoff discards the magnitude of the KPI, whereas Dees et al. use a regression tree for the numeric KPI of their UWV case [@Dees2017]. Throughput time is elapsed wall-clock time, so it includes non-working periods and does not separate waiting from processing. An optimal alignment is also not unique, and the features depend on the one that the solver returns. Dees et al. argue that this choice does not matter when the log contains many traces [@Dees2017], but this was not tested here.
+
+Two further limitations concern the encoding and the rule output. Activities are lifecycle events, such as the suspension or the abortion of a work item, so many features describe interruptions and are hard to read as process deviations. The trace subset of a rule contains every trace that satisfies its conditions, including misclassified ones, whereas Dees et al. keep only correctly classified traces [@Dees2017].
+
+<!-- TYCHO: limitations observed in the results go here. Mean F1 of 0.688 against 0.680 for the all-slow baseline at cutoff 14. The number of rules varies from 2 to 14 across four seeds. 2,704 of the 3,093 traces fall under the main rule, so the model may be too strict rather than the deviation exceptional. One dataset only, and no published BPIC 2017 study with the same setup for comparison. -->
+
+Future work follows from these limitations. A regression tree on the continuous KPI would retain its magnitude. Merging the lifecycle variants of an activity would reduce the number of features. Sampling several optimal alignments per trace would test the sensitivity to the solver's choice. Beyond the deviation analysis, Dees et al. use the selected rules to repair the log and the model, and they name the improvement of several KPIs at once and concept drift as further directions [@Dees2017].
 
 # References
