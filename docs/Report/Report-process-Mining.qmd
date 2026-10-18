@@ -129,3 +129,9 @@ Two further limitations concern the encoding and the rule output. Activities are
 Future work follows from these limitations. A regression tree on the continuous KPI would retain its magnitude. Merging the lifecycle variants of an activity would reduce the number of features. Sampling several optimal alignments per trace would test the sensitivity to the solver's choice. Beyond the deviation analysis, Dees et al. use the selected rules to repair the log and the model, and they name the improvement of several KPIs at once and concept drift as further directions [@Dees2017].
 
 # References
+
+# Technology Statement {.unnumbered}
+
+<!-- RICK: each member confirms the tools they used and that they evaluated the outputs before submission. Check with Karolin whether an appendix counts towards the page limit, or submit this statement separately on Canvas. -->
+
+During the preparation of this work, we used Claude (Sonnet 5.5) and Cursor in order to review code, improve documentation quality, enhance writing clarity, and check statements in the short paper against their sources. The following parts of the assignment were affected by AI tool usage: code suggestions and code review for the implementation and the toy validation scripts, the README, and the short paper. After using these tools, Rick de Rijk, Thom Verzantvoort, Stefan Vonk and Tycho van Rooij evaluated the validity of the tools' outputs, including the sources that the tools referred to, and edited the content as needed. As a consequence, Rick de Rijk, Thom Verzantvoort, Stefan Vonk and Tycho van Rooij take full responsibility for the content of their work.
