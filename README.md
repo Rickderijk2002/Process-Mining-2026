@@ -1,71 +1,128 @@
-# Process Mining — Conformance Checking for Process Improvement
+# Conformance Checking for Process Improvement
 
-JADS course JM0211, Process Mining. Group 8's implementation assignment. Repository for the
-team's work and for instructor access.
+JM0211 Process Mining, group 8. The artefact implements the deviation analysis step of Dees,
+de Leoni and Mannhardt (2017), *Enhancing Process Models to Improve Business Performance*, on the
+BPI Challenge 2017 (Denied) log.
 
-## The assignment
+Given an event log (XES) and a Petri net (PNML), the program
 
-Implement the "Deviation analysis" step from Dees, de Leoni and Mannhardt (2017), *Enhancing
-process models to improve business performance*. Given a Petri net (PNML) and an event log
-(XES), the artefact must:
-
-1. Compute the throughput time of each trace and add it as a log attribute (the KPI).
-2. Generate an alignment for each trace, then encode each trace as model-move and log-move
-   counts per activity.
-3. Fit a classification tree on the encoded traces, using throughput time as the dependent
-   variable, with hyperparameter optimization.
-4. Derive classification rules from the tree and split the log accordingly, so each rule maps
-   to a subset of compliant traces.
-
-Command-line parameter selection is enough; no UI is required. Evaluate the alignments and the
-classification rules against a manually built gold standard, reporting at least precision and
-recall.
-
-Full brief: [assignment/description_group8_conformance_checking.pdf](assignment/description_group8_conformance_checking.pdf)
-
-## Team & task division
-
-Four people, one pipeline stage each, so the technical load splits evenly along the steps the
-assignment already defines.
-
-| Member | Owns | Short paper section |
-|---|---|---|
-| **Rick** — Data & KPI | Load the XES log and PNML model; compute per-trace throughput time and add it as a log attribute | KPI definition |
-| **Stefan** — Alignment & encoding | Generate optimal alignments per trace; encode each trace as model-move / log-move counts per activity | Alignment methodology |
-| **Tycho or Thom** — Classification | Fit a classification tree on the encoded traces against the throughput-time KPI, with hyperparameter optimization | Modeling |
-| **Tycho or Thom** — Rules & evaluation | Derive classification rules from the tree, split the log per rule; build the manual gold standard and score precision/recall | Evaluation |
-
-Classification vs rules/evaluation is still open between Tycho and Thom. Shared rather than owned by
-one person: the poster (assembled from all four sections), the technology statement, and
-integration testing before each deadline. The pipeline is sequential (Stefan needs Rick's output,
-classification needs Stefan's, rules need classification), so whoever finishes their stage early
-picks up the next bottleneck rather than sitting idle.
-
-## Deliverables and dates
-
-| Item | Due |
-|---|---|
-| Short paper draft (peer review) | 28 October, 23:59 |
-| Peer feedback on partner group's draft | 3 November, 23:59 |
-| Final assignment (implementation, poster, short paper, technology statement) | 9 November, 23:59 |
-| Poster session | 12 November, 13:45-15:30 |
-
-Implementation, poster and short paper follow the templates on Canvas.
-
-## Dataset
-
-`datasets/` holds the BPI Challenge 2017 (Denied) subset provided with the assignment:
-
-- `BPI2017Denied(3).xes` — the event log
-- `BPI2017Denied_petriNet.pnml` — the normative process model
-- `Log Description.pdf` — dataset overview
-- `M_dL_M@COOPIS17.pdf` — the Dees/de Leoni/Mannhardt paper the assignment implements
-
-Background: https://www.win.tue.nl/bpi/2017/challenge.html. While developing, work against a
-sample of the log for speed, then validate on the full dataset.
+1. computes the throughput time of every trace and stores it as the case attribute `throughput_time` (days),
+2. computes an optimal alignment for every trace and counts, per activity, the model moves and the log moves,
+3. fits a classification tree on these counts, with a grid search over the tree settings, to separate fast from slow traces,
+4. extracts one rule per leaf and lists the traces that satisfy each rule.
 
 ## Setup
+
+Python 3.12 or later is required. Run all commands from the project root.
+
+With [uv](https://docs.astral.sh/uv/):
 
 ```bash
 uv sync
 ```
+
+With pip:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+The examples below use `python`. With uv, write `uv run python` instead.
+
+## Run
+
+The full pipeline on the provided log, with a 14 day cutoff between fast and slow traces:
+
+```bash
+python src/main.py --cutoff 14
+```
+
+Aligning all 3,093 traces takes several minutes. For a quick check, use a sample of the first 50 traces:
+
+```bash
+python src/main.py --cutoff 14 --sample 50
+```
+
+### Parameters
+
+| Parameter | Default | Meaning |
+|---|---|---|
+| `--cutoff` | required | Throughput time in days. Traces at or below it are fast, traces above it are slow. |
+| `--sample` | all traces | Use only the first N traces, for development. |
+| `--test-size` | 0.25 | Fraction of the traces held out for evaluation. |
+| `--random-state` | 0 | Random seed of the split and the tree. |
+| `--log` | `data/source/BPI2017Denied(3).xes` | Event log. |
+| `--pnml` | `data/source/BPI2017Denied_petriNet.pnml` | Normative Petri net. |
+| `--export` | none | Also write the log enriched with `throughput_time` as XES. |
+| `--export-encodings` | `data/output/alignment_encodings.csv` | Output path of the encoding table. |
+| `--rules` | `data/output/tree_rules.csv` | Output path of the rule table. |
+| `--export-cases` | `data/output/tree_rule_cases.csv` | Output path of the rule-to-trace assignments. |
+
+All paths are relative to the project root.
+
+A sample run overwrites the default output files with sample results. To keep the full-log results in
+`data/output/`, pass other output paths to the sample run, for example `--export-encodings
+data/output/sample_encodings.csv --rules data/output/sample_rules.csv --export-cases
+data/output/sample_cases.csv`.
+
+### Output
+
+- `alignment_encodings.csv`: one row per trace with its case id, `throughput_time`, and the columns `model_move_<activity>` and `log_move_<activity>`.
+- `tree_rules.csv`: one row per leaf with the conditions, the predicted class and the number of fast and slow traces.
+- `tree_rule_cases.csv`: one row per trace with the id of the rule it satisfies.
+
+The program also prints the class balance, the selected tree settings and the precision and recall of the slow class on the held-out traces.
+
+To fit the tree again for another cutoff without repeating the alignments, use the saved encoding table:
+
+```bash
+python scripts/fit_tree.py --cutoff 14 --export-cases data/output/tree_rule_cases.csv
+```
+
+## Validation on hand-built toy logs
+
+The correct move counts of two small logs were derived by hand. The scripts below run the artefact on them and compare the result with these gold standards.
+
+Linear toy (5 traces):
+
+```bash
+python scripts/make_toy.py
+python scripts/align_toy.py
+python scripts/evaluate_toy_alignments.py
+python scripts/check_toy_rules.py
+```
+
+Toy with a parallel block and an exclusive choice (6 traces):
+
+```bash
+python scripts/make_toy_parallel.py
+python scripts/align_toy_parallel.py
+python scripts/evaluate_toy_alignments.py --gold data/gold/toy_parallel_alignment_gold.csv --log data/raw/toy_parallel.xes --pnml data/raw/toy_parallel.pnml --plot data/output/toy_parallel_alignment_gold_vs_pred.png --title "Parallel toy: gold vs predicted"
+python scripts/check_toy_parallel_rules.py
+```
+
+The gold standards are `data/gold/toy_alignment_gold.csv` and `data/gold/toy_parallel_alignment_gold.csv`. The design of both toys is described in `docs/toy.md` and `docs/toy_parallel.md`.
+
+<!-- TODO (after the group decides the headline result): section "Reproducing the reported results" with the exact commands for the cutoff 14 result, the seed stability check (scripts/check_tree_stability.py) and the cutoff comparison (scripts/compare_cutoffs.py). -->
+
+## Project layout
+
+```text
+src/main.py              entry point of the pipeline
+src/data_kpi/            loading the log and net, throughput time
+src/alignment/           alignments and move-count encoding
+src/classification/      tree, grid search, rule extraction
+scripts/                 toy validation, stability check, cutoff comparison, inspection
+data/source/             event log, Petri net, log description, Dees et al. (2017)
+data/gold/               hand-written gold standards
+data/output/             generated tables and figures
+docs/                    method notes, results records, short paper (docs/Report)
+```
+
+## Data
+
+`data/source/` holds the BPI Challenge 2017 (Denied) subset provided with the assignment:
+`BPI2017Denied(3).xes` (the event log, 3,093 traces), `BPI2017Denied_petriNet.pnml` (the normative
+model) and `Log Description.pdf`. Background: https://www.win.tue.nl/bpi/2017/challenge.html.
