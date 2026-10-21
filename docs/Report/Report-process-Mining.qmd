@@ -33,11 +33,25 @@ Page limit on submission: **5 pages excluding references**. Remove this callout 
 
 Conformance checking compares behaviour recorded in an event log with behaviour permitted by a process model in order to identify commonalities and deviations [@Aalst16]. Alignment-based conformance checking can localise deviations as *log moves*, representing observed behaviour that cannot be reproduced by the model, and *model moves*, representing modelled behaviour that was not observed.
 
+\medskip
+
 Deviations from a normative process model are not necessarily associated with poor process performance. Dees et al. [@Dees2017] propose a process improvement methodology in which deviations identified through conformance checking are related to a case-level KPI using classification or regression trees. Deviation patterns associated with satisfactory KPI values can subsequently inform process model enhancement, subject to business constraints.
+
+\medskip
 
 This assignment implements the deviation analysis component of this methodology rather than the complete model repair procedure. For each case, optimal alignments against a Petri net are used to derive deviation features, which are related to case throughput time. Throughput time is defined as the elapsed time between the first and last event of a trace, following the KPI definition used in the UWV case study of Dees et al. [@Dees2017].
 
-Within JM0211, neighbouring topics also treat conformance (for example resource or temporal diagnostics) or process performance via predictive and prescriptive monitoring; this topic differs by linking alignment-based deviation features to a case-level KPI specifically for process improvement.
+\medskip
+
+As a concrete use case, we take the loan application process of a Dutch financial institution from the BPI Challenge 2017 [@vanDongen2017BPIC], restricted to the denied applications. These 3,093 applications take between less than a day and about 260 days from the first to the last event, with a median of 14.4 days. A process owner may ask which deviations from the normative process go together with slow denials, and whether the process should allow or forbid them. This is the question that the deviation analysis answers.
+
+\medskip
+
+Related work covers parts of this setting. Recent work lifts event-level deviations to process-level patterns, such as activities that are inserted, skipped, repeated, replaced or swapped [@grohs2024beyond]. The BPI Challenge 2017 studies that we reviewed do not use the link between deviations and a KPI. Carvallo et al. [@carvallo2017applying] analyse throughput times descriptively, reporting a mean of 18.1 days for approved applications, and they find that about 90 percent of the cancelled applications were cancelled after 30 days. They leave denied applications out of their deeper analysis. Ryu et al. [@ryu2017analysis] apply decision trees at the decision points of the process, but obtain usable results at only one of three. Our modelling choices follow common practice in tree-based process mining: Park et al. [@park2023explainable] select decision-tree parameters by grid search, compare models with five-fold cross-validation and the F1 score, and prune trees to keep them interpretable. To our knowledge, none of these studies relates alignment-based deviation features to a throughput KPI for the Denied subset, which is the gap that this work addresses.
+
+\medskip
+
+Within the course, this topic relates to several others. The topics on resource and temporal conformance also check conformance, but they test constraints taken from natural-language descriptions, whereas we compare control flow with a Petri net and ask what the deviations mean for performance. Decision mining also uses trees and rules, but it explains routing at decision points, whereas we explain a case-level KPI with deviation counts. Predictive process monitoring, including its explainable variants, predicts outcomes or remaining times of running cases and explains the model afterwards, whereas our rules are interpretable by construction and aim at improving the process model. Waiting-time analysis targets the causes of delay, which our throughput time does not separate from processing time. Process discovery, such as the extended alpha miner with lifecycle handling, produces the kind of model that we check against, and its treatment of lifecycle information relates to the lifecycle features that we discuss in @sec-limitations.
 
 # Conceptual Approach
 
@@ -74,11 +88,11 @@ The artefact stores $\kappa(\sigma)$ in days as the case attribute `throughput_t
 
 The second step measures how each trace deviates from the Petri net. An alignment maps a trace onto a run of the net, and every position of the alignment is a synchronous move, a log move or a model move. A synchronous move is an activity that the trace and the model perform together. A log move is an activity that the trace contains and the model does not allow at that point. A model move is an activity that the model requires and the trace lacks [@Aalst16]. @tbl-align shows the three move types for a short trace.
 
-| Position | 1 | 2 | 3 | 4 |
-|---|---|---|---|---|
-| Trace | A | A | $\gg$ | C |
-| Model | A | $\gg$ | B | C |
-| Move | synchronous | log move A | model move B | synchronous |
+| Position | 1           | 2          | 3            | 4           |
+|----------|-------------|------------|--------------|-------------|
+| Trace    | A           | A          | $\gg$        | C           |
+| Model    | A           | $\gg$      | B            | C           |
+| Move     | synchronous | log move A | model move B | synchronous |
 
 : Log moves and model moves arise where a trace and the model disagree. The table shows one alignment of the trace A, A, C against the model A, B, C, in which the symbol $\gg$ marks a skipped position. {#tbl-align}
 
@@ -90,7 +104,7 @@ Each alignment is then encoded as a vector of counts. For each of the 54 visible
 
 The third step relates the encoded deviations to the KPI with a classification tree. Dees et al. use a classification tree for discrete KPI values and a regression tree for numeric ones [@Dees2017]. The brief asks for a classification tree, so the throughput time is discretised: a trace is slow if its throughput time exceeds a cutoff of 14 days, and fast otherwise. The cutoff plays the role of the set of satisfactory KPI values in Dees et al., who accept every duration below 8 days in their UWV case study [@Dees2017]. It lies close to the median of 14.43 days and yields 1,501 fast and 1,592 slow traces. It was fixed before any tree was fitted, so it does not depend on model scores. The discretisation discards the magnitude of the throughput time, which a regression tree would retain.
 
-The tree is fitted on a stratified random sample of 75 percent of the traces, and the remaining 25 percent is held out for evaluation. A grid search with five-fold cross-validation on the training part selects the maximum depth (2 to 5), the minimum leaf size (5, 10 or 20) and the cost-complexity pruning parameter (0, 0.001, 0.01 or 0.1). This gives 48 combinations, and the grid was fixed before any scores were inspected. The selection criterion is the F1 score of the slow class. Pruning limits the number of rules. Unpruned trees produced at least twenty rules, which is too many to interpret.
+The tree is fitted on a stratified random sample of 75 percent of the traces, and the remaining 25 percent is held out for evaluation. A grid search with five-fold cross-validation on the training part selects the maximum depth (2 to 5), the minimum leaf size (5, 10 or 20) and the cost-complexity pruning parameter [@breiman1984classification] (0, 0.001, 0.01 or 0.1). This gives 48 combinations, and the grid was fixed before any scores were inspected. The selection criterion is the F1 score of the slow class. Pruning limits the number of rules. Unpruned trees produced at least twenty rules, which is too many to interpret.
 
 <!-- RICK: Stefan owns the pruning decision. Confirm the last two sentences of the paragraph above. -->
 
@@ -102,21 +116,48 @@ The fourth step reads the fitted tree as rules. Every path from the root to a le
 
 # Implementation
 
-The artefact is implemented in Python 3.12 and organised in three packages that mirror the pipeline: data loading with KPI enrichment, alignment with encoding, and classification with rule extraction. PM4Py [@Berti2019] (version 2.7.23.8) loads the XES log and the PNML net and computes the alignments. The package pandas holds the encoding table, and scikit-learn fits the tree and performs the grid search. A single entry point, `src/main.py`, runs all four steps. It requires the cutoff in days and accepts the hold-out fraction, the random seed, an optional sample size and the output paths as optional parameters. The random seed defaults to 0, so that a run is reproducible. The program writes the encoding table, the rule table and the rule-to-trace assignments as CSV files, and it can export the log enriched with throughput time as XES. All paths are relative to the project root, and `requirements.txt` pins the dependencies. Scripts in the `scripts` directory generate the two toy logs and nets and compare their alignments and rules with the hand-written gold standards.
+The artefact is implemented in Python 3.12 and organised in three packages that mirror the pipeline: data loading with KPI enrichment, alignment with encoding, and classification with rule extraction. PM4Py [@Berti2019] (version 2.7.23.8) loads the XES log and the PNML net and computes the alignments. The package pandas holds the encoding table, and scikit-learn [@pedregosa2011scikit] fits the tree and performs the grid search. A single entry point, `src/main.py`, runs all four steps. It requires the cutoff in days and accepts the hold-out fraction, the random seed, an optional sample size and the output paths as optional parameters. The random seed defaults to 0, so that a run is reproducible. The program writes the encoding table, the rule table and the rule-to-trace assignments as CSV files, and it can export the log enriched with throughput time as XES. All paths are relative to the project root, and `requirements.txt` pins the dependencies. Scripts in the `scripts` directory generate the two toy logs and nets and compare their alignments and rules with the hand-written gold standards.
 
 <!-- RICK: exact run commands for reproducing the evaluation follow from the README, which is written last. -->
 
 # Evaluation Design and Results {#sec-evaluation}
 
-**Owner: Tycho or Thom (lead once assigned), with group input.**
+## Data and evaluation design
 
-The brief requires a manually built gold standard and at least precision and recall for (1) optimal alignments per trace and (2) the recovered classification rules. Dataset: BPI Challenge 2017 (Denied) as provided with the assignment; a sample may be used during development, with final numbers on the full log.
+The evaluation uses the Denied subset of the BPI Challenge 2017 log [@vanDongen2017BPIC] and the Petri net provided with the assignment. The subset has 3,093 traces over 54 visible activities, and throughput times between 0.006 and 259.9 days, with a median of 14.43 and a mean of 17.0 days. A sample of the log served only during development, and all reported numbers use the full log.
 
-## Gold standards for alignments and rules
+The brief asks how well the approach generates the optimal alignments and how well it finds the right classification rules. We therefore evaluate in two ways. The correctness of the alignments and of the rules is tested on two small artificial logs against hand-built gold standards (@sec-gold). On the real log no gold standard for the rules exists, so we measure how well the tree separates slow from fast traces on a stratified hold-out of 25 percent of the traces, with the precision, recall and F1 of the slow class. Each result is compared with the baseline that labels every trace as slow, which has a precision equal to the share of slow traces, a recall of 1 and an F1 of $2p/(1+p)$ for slow share $p$. The main setting is the cutoff of 14 days. Cutoffs of 18 and 21 days, with slow shares of 33.4 and 24.8 percent, test how sensitive the results are to this choice. At these cutoffs the slow class is a minority, so we also compare uniform class weights with balanced weights. These two variants are a sensitivity analysis and not part of the grid that was fixed in advance. A single random split can mislead, so every setting is run with the seeds 0 to 3, and we report the mean and the standard deviation. The seeds reuse the same 3,093 traces, so the standard deviation measures the sensitivity to the split and not independent replication.
 
-The correctness of the alignments and the rules is tested against gold standards built by hand, because the traces of the real log are too long to align manually. Two small logs with their nets serve this purpose: a linear net with five traces, and a net with six traces that adds a parallel block and an exclusive choice. The correct move counts of every trace were derived by hand before the artefact was run. For the rules, the throughput times of selected traces were planted so that one deviation separates slow from fast traces, and the recovered trace sets are compared with the planted ones. Both toys reproduce the hand-derived move counts exactly (5 of 5 and 6 of 6 traces), and both planted rules are recovered with precision and recall of 1.0.
+## Gold standards for alignments and rules {#sec-gold}
 
-*Results and figures on the real log: pending (Tycho).*
+The correctness of the alignments and the rules is tested against gold standards built by hand, because the traces of the real log are too long to align manually. Two small logs with their nets serve this purpose: a linear net with five traces, and a net with six traces that adds a parallel block and an exclusive choice. The correct move counts of every trace were derived by hand before the artefact was run. For the rules, the throughput times of selected traces were planted so that one deviation separates slow from fast traces, and the recovered trace sets are compared with the planted ones. Both toys reproduce the hand-derived move counts exactly (5 of 5 and 6 of 6 traces). Counting every move of the gold standard as one item, the aligner finds all gold moves and adds none, so the precision and the recall of the alignments are 1.0 on both toys. Both planted rules are recovered with precision and recall of 1.0.
+
+## Results on the real log
+
+| Model | Precision | Recall | F1 | Rules |
+|---|---|---|---|---|
+| All slow (baseline) | 0.515 | 1.000 | 0.680 | 1 |
+| Tree, seed 0 | 0.563 | 0.970 | 0.712 | 2 |
+| Tree, seeds 0 to 3 | 0.582 ± 0.019 | 0.855 ± 0.133 | 0.688 ± 0.030 | 7.3 (2 to 14) |
+
+: Cutoff of 14 days. Hold-out scores of the slow class. {#tbl-cut14}
+
+At the cutoff of 14 days, the tree with seed 0 has two rules, a precision of 0.563, a recall of 0.970 and an F1 of 0.712 (@tbl-cut14). Averaged over four seeds, the F1 of 0.688 is only slightly above the 0.680 of the baseline, and the selected tree has between 2 and 14 rules. Seeds 0 and 3 give the two-rule tree, whereas seeds 1 and 2 give trees with 11 and 14 rules and a recall of about 0.74. The only split of the two-rule tree is the log move of `W-Call-after-offers-suspend`. The net allows one suspension of this task, so a log move means an additional suspension. The 389 traces without it are slow in 16 percent of the cases, and the 2,704 traces with it in 57 percent. The larger leaf holds 87 percent of the traces, and its slow share is only 5 points above the base rate of 51.5 percent, so the association is modest.
+
+| Cutoff | Slow share | Weights | Precision | Recall | F1 | Baseline F1 | Rules |
+|--------|---------|--------|--------------|--------------|--------------|--------|--------------|
+| 18 days | 33.4% | uniform | 0.483 ± 0.104 | 0.171 ± 0.046 | 0.247 ± 0.042 | 0.501 | 12.3 (4 to 22) |
+| 18 days | 33.4% | balanced | 0.403 ± 0.016 | 0.826 ± 0.106 | 0.540 ± 0.009 | 0.501 | 8.0 (2 to 12) |
+| 21 days | 24.8% | uniform | 0.608 ± 0.021 | 0.133 ± 0.020 | 0.217 ± 0.027 | 0.397 | 11.0 (8 to 18) |
+| 21 days | 24.8% | balanced | 0.320 ± 0.014 | 0.814 ± 0.030 | 0.460 ± 0.018 | 0.397 | 12.3 (11 to 14) |
+
+: Cutoffs of 18 and 21 days. Hold-out scores of the slow class, mean ± standard deviation over four seeds. {#tbl-robust}
+
+![F1 of the slow class for each cutoff, compared with the baseline that labels every trace as slow. Error bars show one standard deviation over four seeds.](figures/f1_by_cutoff.png){#fig-f1 width=90%}
+
+At the higher cutoffs the slow class is a minority, and the two class weights show a trade-off (@tbl-robust, @fig-f1). Uniform weights give a precision of 0.48 and 0.61, clearly above the base rates of 0.33 and 0.25, but a recall of only 0.17 and 0.13. Balanced weights reach a recall of about 0.8 and an F1 above the baseline (0.540 against 0.501, and 0.460 against 0.397), but their precision is only about 7 points above the base rate. When the grid search was allowed to choose the class weight, it selected the balanced weight in all four seeds at both cutoffs. In the trees with seed 0, the clearest slow rules at 18 and 21 days involve repeated log moves of `O-Refused`: three or more at 18 days, in leaves of 29 to 55 traces with 59 to 71 percent slow traces, and at 21 days in combination with `O-Created`, in a leaf of 113 traces with 60 percent slow traces.
+
+Two settings fail, and the reasons differ. With uniform weights at 18 and 21 days, the F1 falls far below that of the baseline. The largest leaves are mostly fast, so the tree predicts slow only in small leaves, which hold 24 to 113 traces and give the low recall. At the cutoff of 14 days, the tree is unstable. The same grid selects two rules for two seeds and 11 to 14 rules for the other two, with a lower recall, so the two-rule tree should not be read as a stable explanation of the process.
 
 # Limitations and Future Work {#sec-limitations}
 
@@ -124,8 +165,8 @@ The approach has several design limitations. Discretising throughput time at one
 
 Two further limitations concern the encoding and the rule output. Activities are lifecycle events, such as the suspension or the abortion of a work item, so many features describe interruptions and are hard to read as process deviations. The trace subset of a rule contains every trace that satisfies its conditions, including misclassified ones, whereas Dees et al. keep only correctly classified traces [@Dees2017].
 
-<!-- TYCHO: limitations observed in the results go here. Mean F1 of 0.688 against 0.680 for the all-slow baseline at cutoff 14. The number of rules varies from 2 to 14 across four seeds. 2,704 of the 3,093 traces fall under the main rule, so the model may be too strict rather than the deviation exceptional. One dataset only, and no published BPIC 2017 study with the same setup for comparison. -->
+The results add three limitations. First, at the cutoff of 14 days the tree improves the F1 of the all-slow baseline by only 0.008 on average over four seeds, and the selected tree has between 2 and 14 rules, so the two-rule tree is not a stable explanation. Second, the root split is a log move on `W-Call-after-offers-suspend`, which indicates a suspension beyond what the net allows. It occurs in 87 percent of the traces (2,704 of 3,093), so it may reflect a net that is too strict about suspensions and not an exceptional deviation, and its slow share is only 5 points above the base rate. Third, higher cutoffs force a choice between precise rules with a low recall and a high recall with weak precision. The evaluation also covers a single dataset, with four splits of the same traces, and no published BPIC 2017 study with the same setup exists for a comparison. Finally, the artefact uses control flow only, whereas the topic description also names violations of data guards, such as the loan amount.
 
-Future work follows from these limitations. A regression tree on the continuous KPI would retain its magnitude. Merging the lifecycle variants of an activity would reduce the number of features. Sampling several optimal alignments per trace would test the sensitivity to the solver's choice. Beyond the deviation analysis, Dees et al. use the selected rules to repair the log and the model, and they name the improvement of several KPIs at once and concept drift as further directions [@Dees2017].
+Future work follows from these limitations. A regression tree on the continuous KPI would retain its magnitude. Merging the lifecycle variants of an activity would reduce the number of features. Sampling several optimal alignments per trace would test the sensitivity to the solver's choice. Beyond the deviation analysis, Dees et al. use the selected rules to repair the log and the model, and they name the improvement of several KPIs at once and concept drift as further directions [@Dees2017]. Data-aware conformance checking, which also detects violations of data guards, would extend the deviation features beyond control flow.
 
 # References
