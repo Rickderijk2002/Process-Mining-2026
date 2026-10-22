@@ -21,12 +21,6 @@ link-citations: true
 indent: true
 ---
 
-::: callout-note
-## Working draft
-
-Page limit on submission: **5 pages excluding references**. Remove this callout before the final PDF. Section ownership while drafting: Rick = Conceptual Approach (methodology) and Implementation; Tycho = literature, evaluation and results.
-:::
-
 \newpage
 
 # Motivation and Scientific Background
@@ -134,18 +128,18 @@ The correctness of the alignments and the rules is tested against gold standards
 
 ## Results on the real log
 
-| Model | Precision | Recall | F1 | Rules |
-|---|---|---|---|---|
-| All slow (baseline) | 0.515 | 1.000 | 0.680 | 1 |
-| Tree, seed 0 | 0.563 | 0.970 | 0.712 | 2 |
-| Tree, seeds 0 to 3 | 0.582 ± 0.019 | 0.855 ± 0.133 | 0.688 ± 0.030 | 7.3 (2 to 14) |
+| Model               | Precision     | Recall        | F1            | Rules         |
+|---------------|---------------|---------------|---------------|---------------|
+| All slow (baseline) | 0.515         | 1.000         | 0.680         | 1             |
+| Tree, seed 0        | 0.563         | 0.970         | 0.712         | 2             |
+| Tree, seeds 0 to 3  | 0.582 ± 0.019 | 0.855 ± 0.133 | 0.688 ± 0.030 | 7.3 (2 to 14) |
 
 : Cutoff of 14 days. Hold-out scores of the slow class. {#tbl-cut14}
 
 At the cutoff of 14 days, the tree with seed 0 has two rules, a precision of 0.563, a recall of 0.970 and an F1 of 0.712 (@tbl-cut14). Averaged over four seeds, the F1 of 0.688 is only slightly above the 0.680 of the baseline, and the selected tree has between 2 and 14 rules. Seeds 0 and 3 give the two-rule tree, whereas seeds 1 and 2 give trees with 11 and 14 rules and a recall of about 0.74. The only split of the two-rule tree is the log move of `W-Call-after-offers-suspend`. The net allows one suspension of this task, so a log move means an additional suspension. The 389 traces without it are slow in 16 percent of the cases, and the 2,704 traces with it in 57 percent. The larger leaf holds 87 percent of the traces, and its slow share is only 5 points above the base rate of 51.5 percent, so the association is modest.
 
 | Cutoff | Slow share | Weights | Precision | Recall | F1 | Baseline F1 | Rules |
-|--------|---------|--------|--------------|--------------|--------------|--------|--------------|
+|---------|---------|---------|---------|---------|---------|---------|---------|
 | 18 days | 33.4% | uniform | 0.483 ± 0.104 | 0.171 ± 0.046 | 0.247 ± 0.042 | 0.501 | 12.3 (4 to 22) |
 | 18 days | 33.4% | balanced | 0.403 ± 0.016 | 0.826 ± 0.106 | 0.540 ± 0.009 | 0.501 | 8.0 (2 to 12) |
 | 21 days | 24.8% | uniform | 0.608 ± 0.021 | 0.133 ± 0.020 | 0.217 ± 0.027 | 0.397 | 11.0 (8 to 18) |
@@ -153,7 +147,7 @@ At the cutoff of 14 days, the tree with seed 0 has two rules, a precision of 0.5
 
 : Cutoffs of 18 and 21 days. Hold-out scores of the slow class, mean ± standard deviation over four seeds. {#tbl-robust}
 
-![F1 of the slow class for each cutoff, compared with the baseline that labels every trace as slow. Error bars show one standard deviation over four seeds.](figures/f1_by_cutoff.png){#fig-f1 width=90%}
+![F1 of the slow class for each cutoff, compared with the baseline that labels every trace as slow. Error bars show one standard deviation over four seeds.](figures/f1_by_cutoff.png){#fig-f1 width="90%"}
 
 At the higher cutoffs the slow class is a minority, and the two class weights show a trade-off (@tbl-robust, @fig-f1). Uniform weights give a precision of 0.48 and 0.61, clearly above the base rates of 0.33 and 0.25, but a recall of only 0.17 and 0.13. Balanced weights reach a recall of about 0.8 and an F1 above the baseline (0.540 against 0.501, and 0.460 against 0.397), but their precision is only about 7 points above the base rate. When the grid search was allowed to choose the class weight, it selected the balanced weight in all four seeds at both cutoffs. In the trees with seed 0, the clearest slow rules at 18 and 21 days involve repeated log moves of `O-Refused`: three or more at 18 days, in leaves of 29 to 55 traces with 59 to 71 percent slow traces, and at 21 days in combination with `O-Created`, in a leaf of 113 traces with 60 percent slow traces.
 
