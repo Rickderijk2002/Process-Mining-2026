@@ -25,27 +25,15 @@ indent: true
 
 # Motivation and Scientific Background
 
-Conformance checking compares behaviour recorded in an event log with behaviour permitted by a process model in order to identify commonalities and deviations [@Aalst16]. Alignment-based conformance checking can localise deviations as *log moves*, representing observed behaviour that cannot be reproduced by the model, and *model moves*, representing modelled behaviour that was not observed.
+Conformance checking compares behaviour recorded in an event log with behaviour accepted by a process model in order to identify commonalities and deviations [@Aalst16]. Alignment-based conformance checking sees deviations as *log moves*, representing observed behaviour that cannot be reproduced by the model, and *model moves*, representing modelled behaviour that was not observed. The course topics on resource and temporal conformance also check conformance, but against constraints from natural-language descriptions, whereas we compare control flow with a Petri net.
 
-\medskip
+Deviations from a normative process model are not directly linked with poor process performance. Dees et al. [@Dees2017] propose a process improvement methodology in which deviations identified through conformance checking are related to a case-level KPI using classification or regression trees. Deviation patterns associated with satisfactory KPI values can help to enhance process models. Like decision mining, the methods uses trees and rules but it explains a case level KPI and not the routing at decision points. Predictive process monitoring also links process features to outcomes but predicts them for ongoing cases. While our rules are interpretable by design and aim to improve the process.
 
-Deviations from a normative process model are not necessarily associated with poor process performance. Dees et al. [@Dees2017] propose a process improvement methodology in which deviations identified through conformance checking are related to a case-level KPI using classification or regression trees. Deviation patterns associated with satisfactory KPI values can subsequently inform process model enhancement, subject to business constraints.
+This assignment focuses on the deviation analysis component of this method. For each case, optimal alignments against a Petri net are used to derive deviation features, which are related to case throughput time. Throughput time is defined as the elapsed time between the first and last event of a trace, following the KPI definition used in the UWV case study of Dees et al. [@Dees2017]. 
 
-\medskip
+As a concrete use case, the loan application process of a Dutch financial institution from the BPI Challenge 2017 [@vanDongen2017BPIC] is taken, restricted to the denied applications. These applications take between less than a day and about 260 days from the first to the last event. A process owner may ask which deviations from the process go together with slow denials, and whether the process should allow or forbid them. This is the question that the deviation analysis answers. The events contain lifecycle information, which the alpha miner topic also handles and which helps to shape our features (@sec-limitations).
 
-This assignment implements the deviation analysis component of this methodology rather than the complete model repair procedure. For each case, optimal alignments against a Petri net are used to derive deviation features, which are related to case throughput time. Throughput time is defined as the elapsed time between the first and last event of a trace, following the KPI definition used in the UWV case study of Dees et al. [@Dees2017].
-
-\medskip
-
-As a concrete use case, we take the loan application process of a Dutch financial institution from the BPI Challenge 2017 [@vanDongen2017BPIC], restricted to the denied applications. These 3,093 applications take between less than a day and about 260 days from the first to the last event, with a median of 14.4 days. A process owner may ask which deviations from the normative process go together with slow denials, and whether the process should allow or forbid them. This is the question that the deviation analysis answers.
-
-\medskip
-
-Related work covers parts of this setting. Recent work lifts event-level deviations to process-level patterns, such as activities that are inserted, skipped, repeated, replaced or swapped [@grohs2024beyond]. The BPI Challenge 2017 studies that we reviewed do not use the link between deviations and a KPI. Carvallo et al. [@carvallo2017applying] analyse throughput times descriptively, reporting a mean of 18.1 days for approved applications, and they find that about 90 percent of the cancelled applications were cancelled after 30 days. They leave denied applications out of their deeper analysis. Ryu et al. [@ryu2017analysis] apply decision trees at the decision points of the process, but obtain usable results at only one of three. Our modelling choices follow common practice in tree-based process mining: Park et al. [@park2023explainable] select decision-tree parameters by grid search, compare models with five-fold cross-validation and the F1 score, and prune trees to keep them interpretable. To our knowledge, none of these studies relates alignment-based deviation features to a throughput KPI for the Denied subset, which is the gap that this work addresses.
-
-\medskip
-
-Within the course, this topic relates to several others. The topics on resource and temporal conformance also check conformance, but they test constraints taken from natural-language descriptions, whereas we compare control flow with a Petri net and ask what the deviations mean for performance. Decision mining also uses trees and rules, but it explains routing at decision points, whereas we explain a case-level KPI with deviation counts. Predictive process monitoring, including its explainable variants, predicts outcomes or remaining times of running cases and explains the model afterwards, whereas our rules are interpretable by construction and aim at improving the process model. Waiting-time analysis targets the causes of delay, which our throughput time does not separate from processing time. Process discovery, such as the extended alpha miner with lifecycle handling, produces the kind of model that we check against, and its treatment of lifecycle information relates to the lifecycle features that we discuss in @sec-limitations.
+Related work covers parts of this setting. Recent work lifts event-level deviations to process-level patterns, such as activities that are inserted, skipped, repeated, replaced or swapped [@grohs2024beyond]. The BPIC studies that we reviewed do not use the link between deviations and a KPI. Carvallo et al. [@carvallo2017applying] analyse throughput times descriptively, reporting a mean of 18.1 days for approved applications. They leave denied applications out of their deeper analysis. Ryu et al. [@ryu2017analysis] apply decision trees at the decision points of the process, but obtain usable results at only one of three. Our modelling choices follow common practice in tree-based process mining: Park et al. [@park2023explainable] select decision-tree parameters by grid search, compare models with five-fold cross-validation and the F1 score, and prune trees to keep them interpretable. To our knowledge, none of these studies relates alignment-based deviation features to a throughput KPI for the Denied subset, which is the gap that this work addresses.
 
 # Conceptual Approach
 
@@ -118,7 +106,7 @@ The artefact is implemented in Python 3.12 and organised in three packages that 
 
 ## Data and evaluation design
 
-The evaluation uses the Denied subset of the BPI Challenge 2017 log [@vanDongen2017BPIC] and the Petri net provided with the assignment. The subset has 3,093 traces over 54 visible activities, and throughput times between 0.006 and 259.9 days, with a median of 14.43 and a mean of 17.0 days. A sample of the log served only during development, and all reported numbers use the full log.
+The evaluation uses the Denied subset of the BPIC 2017 log [@vanDongen2017BPIC] and the Petri net provided with the assignment. The subset has 3,093 traces over 54 visible activities, and throughput times between 0.006 and 259.9 days, with a median of 14.43 and a mean of 17.0 days. A sample of the log served only during development, and all reported numbers use the full log.
 
 The brief asks how well the approach generates the optimal alignments and how well it finds the right classification rules. We therefore evaluate in two ways. The correctness of the alignments and of the rules is tested on two small artificial logs against hand-built gold standards (@sec-gold). On the real log no gold standard for the rules exists, so we measure how well the tree separates slow from fast traces on a stratified hold-out of 25 percent of the traces, with the precision, recall and F1 of the slow class. Each result is compared with the baseline that labels every trace as slow, which has a precision equal to the share of slow traces, a recall of 1 and an F1 of $2p/(1+p)$ for slow share $p$. The main setting is the cutoff of 14 days. Cutoffs of 18 and 21 days, with slow shares of 33.4 and 24.8 percent, test how sensitive the results are to this choice. At these cutoffs the slow class is a minority, so we also compare uniform class weights with balanced weights. These two variants are a sensitivity analysis and not part of the grid that was fixed in advance. A single random split can mislead, so every setting is run with the seeds 0 to 3, and we report the mean and the standard deviation. The seeds reuse the same 3,093 traces, so the standard deviation measures the sensitivity to the split and not independent replication.
 
@@ -128,6 +116,10 @@ The correctness of the alignments and the rules is tested against gold standards
 
 ## Results on the real log
 
+At the cutoff of 14 days, the tree with seed 0 has two rules, a precision of 0.563, a recall of 0.970 and an F1 of 0.712 (@tbl-cut14). Averaged over four seeds, the F1 of 0.688 is only slightly above the 0.680 of the baseline, and the selected tree has between 2 and 14 rules. Seeds 0 and 3 give the two-rule tree, whereas seeds 1 and 2 give trees with 11 and 14 rules and a recall of about 0.74. The only split of the two-rule tree is the log move of `W-Call-after-offers-suspend`. The net allows one suspension of this task, so a log move means an additional suspension. The 389 traces without it are slow in 16 percent of the cases, and the 2,704 traces with it in 57 percent. The larger leaf holds 87 percent of the traces, and its slow share is only 5 points above the base rate of 51.5 percent, so the association is modest.
+
+At the higher cutoffs the slow class is a minority, and the two class weights show a trade-off (@tbl-robust, @fig-f1). Uniform weights give a precision of 0.48 and 0.61, clearly above the base rates of 0.33 and 0.25, but a recall of only 0.17 and 0.13. Balanced weights reach a recall of about 0.8 and an F1 above the baseline (0.540 against 0.501, and 0.460 against 0.397), but their precision is only about 7 points above the base rate. When the grid search was allowed to choose the class weight, it selected the balanced weight in all four seeds at both cutoffs. In the trees with seed 0, the clearest slow rules at 18 and 21 days involve repeated log moves of `O-Refused`: three or more at 18 days, in leaves of 29 to 55 traces with 59 to 71 percent slow traces, and at 21 days in combination with `O-Created`, in a leaf of 113 traces with 60 percent slow traces.
+
 | Model               | Precision     | Recall        | F1            | Rules         |
 |---------------|---------------|---------------|---------------|---------------|
 | All slow (baseline) | 0.515         | 1.000         | 0.680         | 1             |
@@ -136,20 +128,16 @@ The correctness of the alignments and the rules is tested against gold standards
 
 : Cutoff of 14 days. Hold-out scores of the slow class. {#tbl-cut14}
 
-At the cutoff of 14 days, the tree with seed 0 has two rules, a precision of 0.563, a recall of 0.970 and an F1 of 0.712 (@tbl-cut14). Averaged over four seeds, the F1 of 0.688 is only slightly above the 0.680 of the baseline, and the selected tree has between 2 and 14 rules. Seeds 0 and 3 give the two-rule tree, whereas seeds 1 and 2 give trees with 11 and 14 rules and a recall of about 0.74. The only split of the two-rule tree is the log move of `W-Call-after-offers-suspend`. The net allows one suspension of this task, so a log move means an additional suspension. The 389 traces without it are slow in 16 percent of the cases, and the 2,704 traces with it in 57 percent. The larger leaf holds 87 percent of the traces, and its slow share is only 5 points above the base rate of 51.5 percent, so the association is modest.
-
-| Cutoff | Slow share | Weights | Precision | Recall | F1 | Baseline F1 | Rules |
-|---------|---------|---------|---------|---------|---------|---------|---------|
-| 18 days | 33.4% | uniform | 0.483 ± 0.104 | 0.171 ± 0.046 | 0.247 ± 0.042 | 0.501 | 12.3 (4 to 22) |
-| 18 days | 33.4% | balanced | 0.403 ± 0.016 | 0.826 ± 0.106 | 0.540 ± 0.009 | 0.501 | 8.0 (2 to 12) |
-| 21 days | 24.8% | uniform | 0.608 ± 0.021 | 0.133 ± 0.020 | 0.217 ± 0.027 | 0.397 | 11.0 (8 to 18) |
-| 21 days | 24.8% | balanced | 0.320 ± 0.014 | 0.814 ± 0.030 | 0.460 ± 0.018 | 0.397 | 12.3 (11 to 14) |
+| Cutoff (slow share) | Weights | Precision | Recall | F1 | Baseline F1 | Rules |
+|:------------------|:----------|:-----------------|:-----------------|:-----------------|:--------|:--------------|
+| 18 days (33.4%) | uniform | 0.483 ± 0.104 | 0.171 ± 0.046 | 0.247 ± 0.042 | 0.501 | 12.3 (4–22) |
+| 18 days (33.4%) | balanced | 0.403 ± 0.016 | 0.826 ± 0.106 | 0.540 ± 0.009 | 0.501 | 8.0 (2–12) |
+| 21 days (24.8%) | uniform | 0.608 ± 0.021 | 0.133 ± 0.020 | 0.217 ± 0.027 | 0.397 | 11.0 (8–18) |
+| 21 days (24.8%) | balanced | 0.320 ± 0.014 | 0.814 ± 0.030 | 0.460 ± 0.018 | 0.397 | 12.3 (11–14) |
 
 : Cutoffs of 18 and 21 days. Hold-out scores of the slow class, mean ± standard deviation over four seeds. {#tbl-robust}
 
-![F1 of the slow class for each cutoff, compared with the baseline that labels every trace as slow. Error bars show one standard deviation over four seeds.](figures/f1_by_cutoff.png){#fig-f1 width="90%"}
-
-At the higher cutoffs the slow class is a minority, and the two class weights show a trade-off (@tbl-robust, @fig-f1). Uniform weights give a precision of 0.48 and 0.61, clearly above the base rates of 0.33 and 0.25, but a recall of only 0.17 and 0.13. Balanced weights reach a recall of about 0.8 and an F1 above the baseline (0.540 against 0.501, and 0.460 against 0.397), but their precision is only about 7 points above the base rate. When the grid search was allowed to choose the class weight, it selected the balanced weight in all four seeds at both cutoffs. In the trees with seed 0, the clearest slow rules at 18 and 21 days involve repeated log moves of `O-Refused`: three or more at 18 days, in leaves of 29 to 55 traces with 59 to 71 percent slow traces, and at 21 days in combination with `O-Created`, in a leaf of 113 traces with 60 percent slow traces.
+![F1 of the slow class for each cutoff, compared with the baseline that labels every trace as slow. Error bars show one standard deviation over four seeds.](figures/f1_by_cutoff.png){#fig-f1 width="65%"}
 
 Two settings fail, and the reasons differ. With uniform weights at 18 and 21 days, the F1 falls far below that of the baseline. The largest leaves are mostly fast, so the tree predicts slow only in small leaves, which hold 24 to 113 traces and give the low recall. At the cutoff of 14 days, the tree is unstable. The same grid selects two rules for two seeds and 11 to 14 rules for the other two, with a lower recall, so the two-rule tree should not be read as a stable explanation of the process.
 
