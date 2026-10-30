@@ -13,11 +13,17 @@ Usage (from the repo root):
     uv run python scripts/compare_cutoffs.py
     uv run python scripts/compare_cutoffs.py --cutoffs 14 18 21 --seeds 0 1 2 3 4
     uv run python scripts/compare_cutoffs.py --rules
+    uv run python scripts/compare_cutoffs.py --merge
+
+With --merge, the lifecycle variants of every W- task are merged before the
+trees are fitted (see merge_lifecycle). Results then go to
+cutoff_comparison_merged*.csv, so the unmerged results are never overwritten.
 """
 
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -34,6 +40,50 @@ VARIANTS = {
     "searched": {**DEFAULT_PARAM_GRID, "class_weight": [None, "balanced"]},
 }
 
+# --- Lifecycle merge (optional, --merge) -----------------------------------
+# Every W- task appears in the log and in the Petri net as separate lifecycle
+# activities (-schedule, -start, -suspend, -resume, -complete). Instead of one
+# column per lifecycle variant we use two columns per task and move kind:
+#   pause      = suspend + resume            (the task waited)
+#   execution  = schedule + start + complete (the task was run / repeated / skipped)
+# Not merged and kept as they are: -ate-abort, -withdraw, and the A-, O- and
+# start/end activities (they have no lifecycle suffix).
+# The alignments are NOT recomputed; only the move counts are summed.
+GROUP = {
+    "suspend": "pause",
+    "resume": "pause",
+    "schedule": "execution",
+    "start": "execution",
+    "complete": "execution",
+}
+# Matches e.g. log_move_W-Validate-application-suspend. Only W- tasks are touched,
+# so activities such as A-Complete are never merged by mistake.
+PATTERN = re.compile(
+    r"^(log_move|model_move)_(W-.+)-(suspend|resume|schedule|start|complete)$"
+)
+
+
+def move_columns(frame: pd.DataFrame) -> list[str]:
+    """Feature columns used by the tree (same prefixes as classification.model)."""
+    return [c for c in frame.columns if c.startswith(("log_move_", "model_move_"))]
+
+
+def merge_lifecycle(frame: pd.DataFrame) -> pd.DataFrame:
+    """Sum the lifecycle columns per task into pause / execution columns."""
+    merged: dict[str, list[str]] = {}
+    keep: list[str] = []
+    for column in frame.columns:
+        match = PATTERN.match(column)
+        if match:
+            kind, task, suffix = match.groups()
+            merged.setdefault(f"{kind}_{task}-{GROUP[suffix]}", []).append(column)
+        else:
+            keep.append(column)  # case_id, throughput_time, other move columns
+    out = frame[keep].copy()
+    for new_column, columns in merged.items():
+        out[new_column] = frame[columns].sum(axis=1)
+    return out
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -46,10 +96,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2, 3])
     parser.add_argument("--rules", action="store_true", help="print leaf rules")
     parser.add_argument(
+        "--merge",
+        action="store_true",
+        help="merge lifecycle variants into pause / execution per task",
+    )
+    parser.add_argument(
         "--out",
         type=Path,
-        default=ROOT / "data" / "output" / "cutoff_comparison.csv",
-        help="summary CSV; per-seed and rules CSVs are written next to it",
+        default=None,
+        help="summary CSV; per-seed and rules CSVs are written next to it "
+        "(default: cutoff_comparison.csv, or cutoff_comparison_merged.csv with --merge)",
     )
     return parser.parse_args()
 
@@ -61,7 +117,17 @@ def f1(precision: float, recall: float) -> float:
 
 def main() -> None:
     args = parse_args()
+    if args.out is None:
+        name = "cutoff_comparison_merged.csv" if args.merge else "cutoff_comparison.csv"
+        args.out = ROOT / "data" / "output" / name
     frame = pd.read_csv(args.data)
+    if args.merge:
+        before = frame[move_columns(frame)]
+        frame = merge_lifecycle(frame)
+        after = frame[move_columns(frame)]
+        # Sanity check: merging must only regroup moves, never change the total.
+        assert before.sum().sum() == after.sum().sum(), "merge changed the move total"
+        print(f"Merged lifecycle: {before.shape[1]} -> {after.shape[1]} features")
     first_seed = args.seeds[0]
 
     seed_rows = []
