@@ -98,7 +98,7 @@ The fourth step reads the fitted tree as rules. Every path from the root to a le
 
 # Implementation
 
-The artefact is implemented in Python 3.12 and organised in three packages that mirror the pipeline: data loading with KPI enrichment, alignment with encoding, and classification with rule extraction. PM4Py [@Berti2019] (version 2.7.23.8) loads the XES log and the PNML net and computes the alignments. The package pandas holds the encoding table, and scikit-learn [@pedregosa2011scikit] fits the tree and performs the grid search. A single entry point, `src/main.py`, runs all four steps. It requires the cutoff in days and accepts the hold-out fraction, the random seed, an optional sample size and the output paths as optional parameters. The random seed defaults to 0, so that a run is reproducible. The program writes the encoding table, the rule table and the rule-to-trace assignments as CSV files, and it can export the log enriched with throughput time as XES. All paths are relative to the project root, and `requirements.txt` pins the dependencies. Scripts in the `scripts` directory generate the two toy logs and nets and compare their alignments and rules with the hand-written gold standards.
+The artefact is implemented in Python 3.12 and organised in three packages that mirror the pipeline: data loading with KPI enrichment, alignment with encoding, and classification with rule extraction. PM4Py [@Berti2019] (version 2.7.23.8) loads the XES log and the PNML net and computes the alignments. The package pandas holds the encoding table, and scikit-learn [@pedregosa2011scikit] fits the tree and performs the grid search. A single entry point, `src/main.py`, runs all four steps. It requires the cutoff in days and accepts the hold-out fraction, the random seed, an optional sample size and the output paths as optional parameters. The random seed defaults to 0, so that a run is reproducible. The program writes the encoding table, the rule table and the rule-to-trace assignments as CSV files, and it can export the log enriched with throughput time as XES. All paths are relative to the project root, and `requirements.txt` pins the dependencies. Scripts in the `scripts` directory generate the two toy logs and nets, compare their alignments and rules with the hand-written gold standards, and compare the cutoffs and seeds on the real log (`compare_cutoffs.py`). With `--merge`, that script sums the suspend and resume counts of each task into a pause feature and the schedule, start and complete counts into an execution feature (108 to 74 features), without recomputing the alignments.
 
 <!-- RICK: exact run commands for reproducing the evaluation follow from the README, which is written last. -->
 
@@ -119,6 +119,8 @@ The correctness of the alignments and the rules is tested against gold standards
 At the cutoff of 14 days, the tree with seed 0 has two rules, a precision of 0.563, a recall of 0.970 and an F1 of 0.712 (@tbl-cut14). Averaged over four seeds, the F1 of 0.688 is only slightly above the 0.680 of the baseline, and the selected tree has between 2 and 14 rules. Seeds 0 and 3 give the two-rule tree, whereas seeds 1 and 2 give trees with 11 and 14 rules and a recall of about 0.74. The only split of the two-rule tree is the log move of `W-Call-after-offers-suspend`. The net allows one suspension of this task, so a log move means an additional suspension. The 389 traces without it are slow in 16 percent of the cases, and the 2,704 traces with it in 57 percent. The larger leaf holds 87 percent of the traces, and its slow share is only 5 points above the base rate of 51.5 percent, so the association is modest.
 
 At the higher cutoffs the slow class is a minority, and the two class weights show a trade-off (@tbl-robust, @fig-f1). Uniform weights give a precision of 0.48 and 0.61, clearly above the base rates of 0.33 and 0.25, but a recall of only 0.17 and 0.13. Balanced weights reach a recall of about 0.8 and an F1 above the baseline (0.540 against 0.501, and 0.460 against 0.397), but their precision is only about 7 points above the base rate. When the grid search was allowed to choose the class weight, it selected the balanced weight in all four seeds at both cutoffs. In the trees with seed 0, the clearest slow rules at 18 and 21 days involve repeated log moves of `O-Refused`: three or more at 18 days, in leaves of 29 to 55 traces with 59 to 71 percent slow traces, and at 21 days in combination with `O-Created`, in a leaf of 113 traces with 60 percent slow traces.
+
+We repeated the comparison with the merged encoding (Section 3, @tbl-merge in the appendix). No F1 differs from its unmerged value by more than one standard deviation, for example 0.692 against 0.688 at 14 days with uniform weights and 0.540 against 0.540 at 18 days with balanced weights. The root split is the same, since the pause feature of `W-Call-after-offers` selects the same 389 and 2,704 traces. The rule counts do not become more stable: at 14 days the merged tree for seed 1 shrinks to a single rule that labels every trace as slow.
 
 | Model               | Precision     | Recall        | F1            | Rules         |
 |---------------|---------------|---------------|---------------|---------------|
@@ -145,10 +147,38 @@ Two settings fail, and the reasons differ. With uniform weights at 18 and 21 day
 
 The approach has several design limitations. Discretising throughput time at one cutoff discards the magnitude of the KPI, whereas Dees et al. use a regression tree for the numeric KPI of their UWV case [@Dees2017]. Throughput time is elapsed wall-clock time, so it includes non-working periods and does not separate waiting from processing. An optimal alignment is also not unique, and the features depend on the one that the solver returns. Dees et al. argue that this choice does not matter when the log contains many traces [@Dees2017], but this was not tested here.
 
-Two further limitations concern the encoding and the rule output. Activities are lifecycle events, such as the suspension or the abortion of a work item, so many features describe interruptions and are hard to read as process deviations. The trace subset of a rule contains every trace that satisfies its conditions, including misclassified ones, whereas Dees et al. keep only correctly classified traces [@Dees2017].
+Two further limitations concern the encoding and the rule output. Activities are lifecycle events, such as the suspension or the abortion of a work item, so many features describe interruptions and are hard to read as process deviations. Merging the lifecycle variants did not change the scores (Section 4.3), so the results do not depend on this choice, but it also did not make the rules easier to interpret. The trace subset of a rule contains every trace that satisfies its conditions, including misclassified ones, whereas Dees et al. keep only correctly classified traces [@Dees2017].
 
 The results add three limitations. First, at the cutoff of 14 days the tree improves the F1 of the all-slow baseline by only 0.008 on average over four seeds, and the selected tree has between 2 and 14 rules, so the two-rule tree is not a stable explanation. Second, the root split is a log move on `W-Call-after-offers-suspend`, which indicates a suspension beyond what the net allows. It occurs in 87 percent of the traces (2,704 of 3,093), so it may reflect a net that is too strict about suspensions and not an exceptional deviation, and its slow share is only 5 points above the base rate. Third, higher cutoffs force a choice between precise rules with a low recall and a high recall with weak precision. The evaluation also covers a single dataset, with four splits of the same traces, and no published BPIC 2017 study with the same setup exists for a comparison. Finally, the artefact uses control flow only, whereas the topic description also names violations of data guards, such as the loan amount.
 
-Future work follows from these limitations. A regression tree on the continuous KPI would retain its magnitude. Merging the lifecycle variants of an activity would reduce the number of features. Sampling several optimal alignments per trace would test the sensitivity to the solver's choice. Beyond the deviation analysis, Dees et al. use the selected rules to repair the log and the model, and they name the improvement of several KPIs at once and concept drift as further directions [@Dees2017]. Data-aware conformance checking, which also detects violations of data guards, would extend the deviation features beyond control flow.
+Future work follows from these limitations. A regression tree on the continuous KPI would retain its magnitude. Sampling several optimal alignments per trace would test the sensitivity to the solver's choice. Beyond the deviation analysis, Dees et al. use the selected rules to repair the log and the model, and they name the improvement of several KPIs at once and concept drift as further directions [@Dees2017]. Data-aware conformance checking, which also detects violations of data guards, would extend the deviation features beyond control flow.
 
 # References
+
+\newpage
+
+# Appendix {-}
+
+## Lifecycle merge experiment {-}
+
+## Lifecycle merge experiment {-}
+
+We tested whether the encoding of lifecycle events affects the results. The unmerged encoding has one feature per lifecycle variant (108 features). In the merged encoding, the suspend and resume counts of each work task are summed into one pause feature, and the schedule, start and complete counts into one execution feature (74 features). The `-ate-abort` and `-withdraw` variants and the A- and O- activities are unchanged, and the alignments are not recomputed. Both encodings use the same cutoffs, seeds 0 to 3, grid and class weights. @tbl-merge shows the hold-out scores as mean ± standard deviation over four seeds, and the number of rules as mean (minimum to maximum). The merged encoding changes no F1 by more than one standard deviation. The merged tree for 14 days, uniform weights and seed 1 is a single rule that labels every trace as slow, which lowers the minimum rule count to 1.
+
+
+| Cutoff | Weights | Encoding | Precision | Recall | F1 | Rules |
+|:--------|:---------|:---------|:----------------|:----------------|:----------------|:-------------|
+| 14 days | uniform | unmerged | 0.582 ± 0.019 | 0.855 ± 0.133 | 0.688 ± 0.030 | 7.3 (2–14) |
+| 14 days | uniform | merged | 0.560 ± 0.034 | 0.921 ± 0.119 | 0.692 ± 0.026 | 4.8 (1–14) |
+| 14 days | balanced | unmerged | 0.584 ± 0.023 | 0.848 ± 0.141 | 0.687 ± 0.032 | 7.0 (2–13) |
+| 14 days | balanced | merged | 0.583 ± 0.021 | 0.854 ± 0.134 | 0.689 ± 0.030 | 5.3 (2–10) |
+| 18 days | uniform | unmerged | 0.483 ± 0.104 | 0.171 ± 0.046 | 0.247 ± 0.042 | 12.3 (4–22) |
+| 18 days | uniform | merged | 0.500 ± 0.074 | 0.184 ± 0.042 | 0.264 ± 0.034 | 16.8 (4–21) |
+| 18 days | balanced | unmerged | 0.403 ± 0.016 | 0.826 ± 0.106 | 0.540 ± 0.009 | 8.0 (2–12) |
+| 18 days | balanced | merged | 0.403 ± 0.016 | 0.826 ± 0.106 | 0.540 ± 0.009 | 8.8 (2–12) |
+| 21 days | uniform | unmerged | 0.608 ± 0.021 | 0.133 ± 0.020 | 0.217 ± 0.027 | 11.0 (8–18) |
+| 21 days | uniform | merged | 0.592 ± 0.045 | 0.124 ± 0.017 | 0.204 ± 0.022 | 11.8 (8–22) |
+| 21 days | balanced | unmerged | 0.320 ± 0.014 | 0.814 ± 0.030 | 0.460 ± 0.018 | 12.3 (11–14) |
+| 21 days | balanced | merged | 0.320 ± 0.014 | 0.814 ± 0.030 | 0.460 ± 0.018 | 11.5 (10–14) |
+
+: Merged against unmerged lifecycle encoding. Hold-out scores of the slow class, mean ± standard deviation over four seeds. {#tbl-merge}
