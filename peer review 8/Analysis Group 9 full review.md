@@ -51,7 +51,7 @@ groups (same pipeline, different learner; others changed feature space or did po
 
 **Works:** Python version, uv and pyproject, package table with versions, module and notebook structure, seeds, temperature 0, 32,768 context with a server check, token limit, timeout, retries, fallback label (115 of 12,084 answers), split and prefix counts, diagonal covariance choice with reason, prompt in Appendix A. Numbers are internally consistent (914 + 229 = 1,143 cases; 1,007 prefixes x 3 versions x 4 rules = 12,084).
 
-**Missing:** notebook run order, data location, runtime, hardware behind Ollama, note that temperature 0 on a remote server is not guaranteed identical, JEV API access and cost, typesafe-sdk 0.7.4 versus model jev-1.13.0, typo "removed form". Package versions could not be checked against their pyproject, so "matches the actual implementation" is unverified.
+**Missing:** notebook run order, data location, runtime, hardware behind Ollama, note that temperature 0 on a remote server is not guaranteed identical, JEV as hosted API (key, cost, availability of the pinned version), typesafe-sdk 0.7.4 versus model jev-1.13.0, typo "removed form". Package versions could not be checked against their pyproject, so "matches the actual implementation" is unverified.
 
 ## S4 Evaluation design and results (8)
 
