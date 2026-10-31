@@ -40,8 +40,8 @@ groups (same pipeline, different learner; others changed feature space or did po
 **Works:** two workflows clearly separated, parameters and values listed, output stated, Figure 1 exists.
 
 **Holds it back:**
-- Parameter purposes mostly missing (g, k via BIC, epsilon, minPoints, 0.5 threshold). The rubric asks for purpose.
-- Section 2.3 is thin. Last-state, sequential and frequency encoding are not explained there (frequency encoding only appears in 3.2.1).
+- Section 2.2 gives parameter values but not their purpose (g, k via BIC, epsilon, minPoints, 0.5 threshold). The rubric asks for purpose.
+- Section 2.3 is longer than 2.2 but has a lot to cover (five models, two encodings, three prompt versions, JEV) and names terms without defining them: last-state, sequential and frequency encoding (frequency only appears in 3.2.1). The reader learns the meaning in Section 3.
 - Their own additions and the leakage argument (pm4py copies trace-level attributes onto every event, so a length-1 prefix already carries the final diagnosis and treatment) are the most original conceptual part, yet sit under Implementation (3.2.2) and are missing from Figure 1.
 - Figure 1 omits JEV and its layout is hard to read.
 - LTL rules 1 to 4 (phi 1 to phi 4) are never stated in the text.
