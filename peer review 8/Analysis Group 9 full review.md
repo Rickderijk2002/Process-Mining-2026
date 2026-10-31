@@ -1,7 +1,7 @@
 # Peer review draft: Group 9 short paper (S1 to S6)
 
 Draft for Rick to review and adjust. Grades are proposals, feedback text is in the workbook
-`Rubric_Group9_peer_review_DRAFT_S1-S6.xlsx` (columns I and K of sheet Rubric_ShortPaper).
+`Rubric_Group9_peer_review_DRAFT_v1.xlsx` (columns I and K of sheet Rubric_ShortPaper).
 Our feedback to Group 9 is due 3 November, 23:59. The rubric asks for an on-time, elaborate,
 constructive, complete review with improvement directions. S3 can only be partly checked because we
 have no access to their code. We do not have the page limit of the short paper template (S6).
