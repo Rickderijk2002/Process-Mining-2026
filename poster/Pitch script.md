@@ -28,7 +28,7 @@ Limit: 3 minutes. About 375 words (about 2:45 at a calm pace, leaving room to br
 
 "We are happy to take your questions."
 
-The spoken text is 374 words; time it aloud and adjust.
+The spoken text is 371 words; time it aloud and adjust.
 
 ## Rehearsal rules
 
