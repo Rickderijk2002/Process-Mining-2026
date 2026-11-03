@@ -72,14 +72,3 @@ Short answers drawn from the paper and the result files. If a question goes beyo
 15. **What would you tell the process owner?** Honestly: no robust recommendation yet. The one candidate is the additional suspension of the after-offers call, but the association is modest and the net may be too strict. The method is correct; the signal in this log is weak.
 
 16. **How is the code organised and how do I run it?** Python 3.12, three packages that mirror the pipeline (loading and KPI, alignment and encoding, classification and rules). Entry point `src/main.py` with the required `--cutoff` parameter, optional hold-out fraction, seed (default 0), sample size and output paths. Output: encoding table, rule table and rule-to-trace assignments as CSV. (The README is still to be written, see open items.)
-
-## Open items for the group
-
-1. Stefan: confirm the pruning claim in the paper (unpruned trees gave at least twenty rules) and that it can appear in the pitch.
-2. Confirm with Karolin that the CSV of rule and case identifiers satisfies "split the log accordingly" (office hour 26 October; was an answer received?).
-3. Decide whether to add a Petri net excerpt or the throughput histogram to the poster (there is room only if another block shrinks).
-4. ~~Print mean and SD next to the chart~~ Done 2026-11-03: shown in the 14 day chart title.
-5. Decide the print size (A2 is the minimum; the PDF scales without distortion to A1).
-6. Print a draft at A2 (or A4 at 25 percent) and check readability from 1.5 m.
-7. Fix the duplicated "Lifecycle merge experiment" heading in the appendix of the paper.
-8. Decide who gives the pitch first and the rotation, and rehearse with a timer.
