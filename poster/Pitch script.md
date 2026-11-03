@@ -6,7 +6,7 @@ Limit: 3 minutes. About 375 words (about 2:45 at a calm pace, leaving room to br
 
 **0:00 to 0:35, Motivation [top block]**
 
-"Good afternoon, we are group 8. A Dutch bank denied 3,093 loan applications: some within a day, others after about 260 days. The process owner asks which deviations from the normative process go together with slow denials, and whether to allow or forbid them. Deviations are not automatically bad; Dees and colleagues showed that some are workarounds linked to better performance. We implement their deviation analysis step. Other course topics check resources or time against text constraints; we check control flow against a Petri net."
+"Good afternoon, we are group 8. A Dutch bank denied 3,093 loan applications: some within a day, others after about 260 days. The process owner asks which deviations go with slow denials: allow or forbid? Deviations are not automatically bad; Dees and colleagues showed that some are workarounds linked to better performance. We implement their deviation analysis step. Other course topics check resources or time against text constraints; we check control flow against a Petri net."
 
 **0:35 to 1:25, Approach [second block]**
 
@@ -16,7 +16,7 @@ Limit: 3 minutes. About 375 words (about 2:45 at a calm pace, leaving room to br
 
 **1:25 to 2:25, Evaluation [third block]**
 
-"Two evaluations. First, correctness: two hand built toy logs with derived move counts and a planted rule. All counts matched and the rules were recovered, precision and recall 1.0. Second, usefulness on the real log: a 25 percent hold-out, F1 of the slow class against an all-slow baseline. Seed 0 gives two rules and F1 0.712, but over four seeds the mean is 0.688 against 0.680 for the baseline, and the tree size jumps between 2 and 14 rules. The two rule tree splits on an extra suspension of W-Call-after-offers: 57 percent of those traces are slow, against 16 percent without it. At 18 and 21 days only balanced class weights beat the baseline."
+"Two evaluations. First, correctness: two hand built toy logs with derived move counts and a planted rule. All counts matched and the rules were recovered, precision and recall 1.0. Second, usefulness on the real log: a 25 percent hold-out, F1 of the slow class against an all-slow baseline. Seed 0 gives two rules and F1 0.712. The baseline just predicts every trace slow. Over four seeds the mean is 0.688 against 0.680 for the baseline, and the tree size jumps between 2 and 14 rules. The two rule tree splits on an extra suspension of W-Call-after-offers: 57 percent of those traces are slow, against 16 percent without it. At 18 and 21 days only balanced class weights beat the baseline."
 
 *Cut point: drop the 18 and 21 day sentence.*
 
@@ -78,7 +78,7 @@ Short answers drawn from the paper and the result files. If a question goes beyo
 1. Stefan: confirm the pruning claim in the paper (unpruned trees gave at least twenty rules) and that it can appear in the pitch.
 2. Confirm with Karolin that the CSV of rule and case identifiers satisfies "split the log accordingly" (office hour 26 October; was an answer received?).
 3. Decide whether to add a Petri net excerpt or the throughput histogram to the poster (there is room only if another block shrinks).
-4. Decide whether to print "mean and SD over four seeds" next to the class weight chart.
+4. ~~Print mean and SD next to the chart~~ Done 2026-11-03: shown in the 14 day chart title.
 5. Decide the print size (A2 is the minimum; the PDF scales without distortion to A1).
 6. Print a draft at A2 (or A4 at 25 percent) and check readability from 1.5 m.
 7. Fix the duplicated "Lifecycle merge experiment" heading in the appendix of the paper.

@@ -61,7 +61,7 @@ What satisfies it: a script of about 375 words (about 2:45 at a calm speaking pa
 Checklist:
 * [ ] Script rehearsed aloud with a timer by every member, between 2:40 and 3:00.
 * [ ] Time marks on the script match the poster blocks.
-* [ ] A cut version exists (drop the lifecycle merge sentence and the 18 and 21 day detail) for when a listener interrupts.
+* [ ] A cut version exists (drop the parameter sentence and the 18 and 21 day detail) for when a listener interrupts.
 * [ ] Every member can deliver it (template instruction).
 
 ### P4 Terminology and presentation style (3 points)
@@ -136,7 +136,7 @@ Checklist:
 
 ## 3. Section by section content outline and word budgets
 
-Total budget about 380 words plus visuals.
+Total budget about 380 words plus visuals. **Revised 2026-11-03 after peer feedback ("too much text")**: section text cut from about 410 to about 334 words by turning sentences into keyword fragments (Motivation 64, Approach 106, Evaluation 122, Limitations 42); body text raised from 28 to 32 px. The detail that left the poster is spoken in the pitch.
 
 | Section | Words | Content | Visuals |
 |---|---|---|---|
@@ -195,7 +195,7 @@ P5 Visualizations
 * [x] Visuals in every section except Limitations (text only, by design).
 * [x] Axes start at zero; move types carry text labels, not only colour.
 * [x] Evaluation has three data visuals.
-* [ ] Standard deviation error bars are drawn on the class weight chart but the poster does not say "SD over four seeds" next to it (only in the pitch). Open item.
+* [x] SD now stated on the poster: the 14 day chart title reads "mean 0.688 ± SD 0.030" (2026-11-03).
 
 P6 Readability
 * [x] Page size A2 portrait, one page, PDF exported at true size.
@@ -226,4 +226,4 @@ These are the points a critical reader can attack. The poster does not hide them
 
 ## 8. Open items needing the group's decision
 
-See the final message and the bottom of `Pitch script.md`. In short: confirm the pruning claim (Stefan), whether to add a Petri net excerpt or throughput histogram, whether to add "SD over four seeds" text next to the chart, print size (A2 or larger), and who delivers the pitch first.
+See the final message and the bottom of `Pitch script.md`. In short: confirm the pruning claim (Stefan), whether to add a Petri net excerpt or throughput histogram, print size (A2 or larger), and who delivers the pitch first.
