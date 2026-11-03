@@ -15,7 +15,7 @@
 html,body{background:#888;}
 body{font-family:"Segoe UI",Arial,Helvetica,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .poster{width:420mm;height:594mm;background:var(--paper);margin:0 auto;position:relative;overflow:hidden;
-  display:flex;flex-direction:column;padding:20px 28px 16px;gap:10px;font-size:28px;line-height:1.18}
+  display:flex;flex-direction:column;padding:20px 28px 16px;gap:10px;font-size:32px;line-height:1.18}
 @media print{html,body{background:#fff}.poster{margin:0}}
 
 /* header */
@@ -58,7 +58,7 @@ li::before{content:"";position:absolute;left:3px;top:.52em;width:12px;height:12p
 .step{border:3px solid var(--maroon);border-radius:10px;padding:6px 10px;background:#fff}
 .step .no{display:inline-block;width:46px;height:46px;border-radius:50%;background:var(--maroon);color:#fff;text-align:center;font-weight:800;font-size:30px;line-height:46px;margin-right:8px}
 .step h3{display:inline;font-size:30px}
-.step p{margin-top:2px;font-size:27px;line-height:1.15}
+.step p{margin-top:2px;font-size:31px;line-height:1.15}
 .arrow{align-self:center;font-size:54px;color:var(--maroon);font-weight:800}
 .io{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .io .card{background:var(--maroon-soft);border-color:var(--maroon-soft);padding:6px 12px}
@@ -97,7 +97,8 @@ table{border-collapse:collapse;width:100%}
 .take{background:var(--maroon);color:#fff;border-radius:10px;padding:4px 14px;font-size:28px;font-weight:600;text-align:center}
 .res3{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}
 .colL,.colR{display:flex;flex-direction:column;gap:10px}
-.colL .panel{flex:1;justify-content:center}
+.colL .panel{flex:1;justify-content:flex-start}
+.colL .panel .tree{flex:1;justify-content:center}
 .colR .panel{flex:1}
 
 /* section 4 */
@@ -125,12 +126,12 @@ footer{font-size:24px;white-space:nowrap;overflow:hidden;color:var(--muted);line
   <div class="body">
     <div class="col2">
       <ul>
-        <li><b>Use case.</b> A Dutch bank (BPI Challenge 2017) denied 3,093 loan applications, in under a day or after about 260 days.</li>
-        <li><b>Question.</b> Which deviations from the normative process go with slow denials? Allow or forbid them?</li>
+        <li><b>Use case.</b> Dutch bank, BPI 2017: 3,093 denials, under 1 day to ~260 days</li>
+        <li><b>Question.</b> Which deviations go with slow denials? Allow or forbid?</li>
       </ul>
       <ul>
-        <li><b>Why not flag all deviations?</b> Some are workarounds linked to better performance (Dees et al., 2017).</li>
-        <li><b>Course fit.</b> Resource and temporal conformance check text constraints; we check <b>control flow against a model</b>.</li>
+        <li><b>Not all bad.</b> Some are workarounds (Dees et al., 2017)</li>
+        <li><b>Course fit.</b> We check <b>control flow vs a model</b></li>
       </ul>
     </div>
     <div class="tiles">
@@ -146,17 +147,17 @@ footer{font-size:24px;white-space:nowrap;overflow:hidden;color:var(--muted);line
   <h2>Explanation of Conceptual Approach</h2>
   <div class="body">
     <div class="io">
-      <div class="card"><h3>Input</h3><b>XES log</b>: case id, activity, timestamp per event. <b>PNML Petri net</b>: normative model.</div>
-      <div class="card"><h3>Output</h3><b>Rules</b> on move counts, plus the <b>traces</b> satisfying each rule (CSV).</div>
+      <div class="card"><h3>Input</h3><b>XES log</b> + <b>Petri net</b> (PNML)</div>
+      <div class="card"><h3>Output</h3><b>Rules</b> + <b>trace lists</b> (CSV)</div>
     </div>
     <div class="flow">
-      <div class="step"><span class="no">1</span><h3>KPI</h3><p>Throughput time per trace, in days.</p></div>
+      <div class="step"><span class="no">1</span><h3>KPI</h3><p>Throughput time</p></div>
       <div class="arrow">&rsaquo;</div>
-      <div class="step"><span class="no">2</span><h3>Align, encode</h3><p>Optimal alignment; count moves.</p></div>
+      <div class="step"><span class="no">2</span><h3>Align, encode</h3><p>Count log/model moves</p></div>
       <div class="arrow">&rsaquo;</div>
-      <div class="step"><span class="no">3</span><h3>Classify</h3><p>Slow above cutoff; decision tree.</p></div>
+      <div class="step"><span class="no">3</span><h3>Classify</h3><p>Slow &gt; 14 days; tree</p></div>
       <div class="arrow">&rsaquo;</div>
-      <div class="step"><span class="no">4</span><h3>Rules</h3><p>Each leaf is one rule.</p></div>
+      <div class="step"><span class="no">4</span><h3>Rules</h3><p>Leaf = rule</p></div>
     </div>
     <div class="col2" style="grid-template-columns:1.3fr 1fr">
       <div class="card">
@@ -172,9 +173,9 @@ footer{font-size:24px;white-space:nowrap;overflow:hidden;color:var(--muted);line
       <div class="card">
         <h3>Parameters</h3>
         <table class="ptab">
-          <tr><td>Cutoff</td><td>14 days; slow above</td></tr>
+          <tr><td>Cutoff</td><td>14 days</td></tr>
           <tr><td>Hold-out</td><td>25%, seed 0</td></tr>
-          <tr><td>Grid</td><td>48: depth, leaf, pruning</td></tr>
+          <tr><td>Grid</td><td>48 combinations</td></tr>
           <tr><td>Tuning</td><td>5-fold CV, F1 of slow</td></tr>
         </table>
       </div>
@@ -188,11 +189,11 @@ footer{font-size:24px;white-space:nowrap;overflow:hidden;color:var(--muted);line
     <div class="res3">
       <div class="colL">
         <div class="card"><h3>1. Correctness: hand-built gold standard</h3>
-          2 toy logs (5 and 6 traces), move counts and a planted rule derived by hand first.
+          2 toy logs (5 and 6 traces), derived by hand
           <div class="score"><span class="chip">5/5, 6/6 <small>traces exact</small></span><span class="chip">1.0 <small>alignment P, R</small></span><span class="chip">1.0 <small>rule P, R</small></span></div>
         </div>
         <div class="card"><h3>2. Usefulness: real log, 25% hold-out</h3>
-          Precision (P), recall (R), F1 of the slow class vs an <b>all-slow baseline</b>, seeds 0 to 3.
+          Slow class vs <b>all-slow baseline</b>, seeds 0 to 3
           <div class="score"><span class="chip">0.712 <small>F1 seed 0</small></span><span class="chip">0.688 <small>mean</small></span><span class="chip">0.680 <small>baseline</small></span></div>
         </div>
         <div class="panel">
@@ -200,8 +201,8 @@ footer{font-size:24px;white-space:nowrap;overflow:hidden;color:var(--muted);line
           <div class="tree">
             <div class="root">log move of <code>W-Call-after-offers-suspend</code> ?</div>
             <div class="branches">
-              <div class="leaf fast"><span class="c">none</span><span class="big">389</span>traces, 16% slow<br><b>predict fast</b></div>
-              <div class="leaf slow"><span class="c">at least one</span><span class="big">2,704</span>traces, 57% slow<br><b>predict slow</b></div>
+              <div class="leaf fast"><span class="c">none</span><span class="big">389</span>traces, 16% slow<br><b>fast</b></div>
+              <div class="leaf slow"><span class="c">at least one</span><span class="big">2,704</span>traces, 57% slow<br><b>slow</b></div>
             </div>
             <div class="lbl" style="margin-top:4px;text-align:center">Base rate of slow: 51.5%. P 0.563, R 0.970, F1 0.712</div>
           </div>
@@ -209,7 +210,7 @@ footer{font-size:24px;white-space:nowrap;overflow:hidden;color:var(--muted);line
       </div>
       <div class="colR">
         <div class="panel">
-          <h3>14 days: same grid, four splits (F1)</h3>
+          <h3>14 days: four seeds, F1 (mean 0.688 ± SD 0.030)</h3>
           <svg viewBox="0 -22 700 254" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif"><line x1="90" y1="106.0" x2="690" y2="106.0" stroke="#e0e0e0" stroke-width="2"/><text x="80" y="114.0" font-size="26" fill="#444" text-anchor="end">0.4</text><line x1="90" y1="42.0" x2="690" y2="42.0" stroke="#e0e0e0" stroke-width="2"/><text x="80" y="50.0" font-size="26" fill="#444" text-anchor="end">0.8</text><line x1="90" y1="170" x2="690" y2="170" stroke="#555" stroke-width="3"/><text x="80" y="178" font-size="26" fill="#444" text-anchor="end">0</text><rect x="120" y="56.1" width="100" height="113.9" fill="#2a78d4"/><text x="170" y="94.1" font-size="28" font-weight="700" text-anchor="middle" fill="#fff">0.712</text><rect x="260" y="64.2" width="100" height="105.8" fill="#2a78d4"/><text x="310" y="102.2" font-size="28" font-weight="700" text-anchor="middle" fill="#fff">0.661</text><rect x="400" y="64.1" width="100" height="105.9" fill="#2a78d4"/><text x="450" y="102.1" font-size="28" font-weight="700" text-anchor="middle" fill="#fff">0.662</text><rect x="540" y="55.4" width="100" height="114.6" fill="#2a78d4"/><text x="590" y="93.4" font-size="28" font-weight="700" text-anchor="middle" fill="#fff">0.716</text><line x1="90" y1="61.2" x2="690" y2="61.2" stroke="#1b1b1b" stroke-width="4" stroke-dasharray="14 8"/><line x1="100" y1="-8" x2="170" y2="-8" stroke="#1b1b1b" stroke-width="4" stroke-dasharray="14 8"/><text x="182" y="1" font-size="26" fill="#444">all-slow baseline, F1 0.680</text><text x="170" y="198" font-size="27" text-anchor="middle" fill="#1b1b1b">seed 0</text><text x="310" y="198" font-size="27" text-anchor="middle" fill="#1b1b1b">seed 1</text><text x="450" y="198" font-size="27" text-anchor="middle" fill="#1b1b1b">seed 2</text><text x="590" y="198" font-size="27" text-anchor="middle" fill="#1b1b1b">seed 3</text><text x="170" y="226" font-size="27" font-weight="700" text-anchor="middle" fill="#6b2e2a">2 rules</text><text x="310" y="226" font-size="27" font-weight="700" text-anchor="middle" fill="#6b2e2a">11 rules</text><text x="450" y="226" font-size="27" font-weight="700" text-anchor="middle" fill="#6b2e2a">14 rules</text><text x="590" y="226" font-size="27" font-weight="700" text-anchor="middle" fill="#6b2e2a">2 rules</text></svg>
         </div>
         <div class="panel">
@@ -229,17 +230,17 @@ footer{font-size:24px;white-space:nowrap;overflow:hidden;color:var(--muted);line
       <div>
         <h3>Limitations</h3>
         <ul>
-          <li>Two-rule tree is unstable across splits.</li>
-          <li>Root split hits 87% of traces: net may be too strict.</li>
-          <li>One cutoff, one dataset, control flow only.</li>
+          <li>Tree unstable across splits</li>
+          <li>Root split hits 87% of traces: net too strict?</li>
+          <li>One cutoff, one dataset, control flow only</li>
         </ul>
       </div>
       <div>
         <h3>Future work</h3>
         <ul>
-          <li>Regression tree on continuous throughput time.</li>
-          <li>Sample several optimal alignments per trace.</li>
-          <li>Data-aware checking (guards such as loan amount).</li>
+          <li>Regression tree on throughput time</li>
+          <li>Several optimal alignments per trace</li>
+          <li>Data-aware checking (e.g. loan amount)</li>
         </ul>
       </div>
     </div>
