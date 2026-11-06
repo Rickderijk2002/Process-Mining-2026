@@ -2,40 +2,27 @@
 
 Limit: 3 minutes. About 375 words (about 2:45 at a calm pace, leaving room to breathe). Every member must be able to deliver it. Point at the poster block named in brackets. If a listener asks a question, answer it, then return to the next block (the script can be cut at the marked points).
 
-## Pitch (about 375 words)
+## Pitch (about 365 words)
 
-**0:00 to 0:35, Motivation [top block]**
+**0:00 to 0:30, Motivation [top block]**
 
-"Good afternoon, we are group 8. A Dutch bank denied 3,093 loan applications: some within a day, others after about 260 days. The process owner asks which deviations go with slow denials: allow or forbid? Deviations are not automatically bad; Dees and colleagues showed that some are workarounds linked to better performance. We implement their deviation analysis step. Other course topics check resources or time against text constraints; we check control flow against a Petri net."
+"Hi, we are group 8. Imagine you apply for a loan and get denied. One applicant hears back within a day. Another waits more than eight months. Same bank, same process. We analysed 3,093 such denied applications from a Dutch bank. Our question: which deviations from the official process go with the slow cases? Then the bank knows what to allow and what to forbid. Deviations are not automatically bad, some are useful workarounds."
 
-**0:35 to 1:25, Approach [second block]**
+**0:30 to 1:15, Approach [second block]**
 
-"The input is an XES log with case, activity and timestamp per event, plus a Petri net. Four steps. One: throughput time per trace. Two: an optimal alignment per trace. In this example, trace A, A, C against model A, B, C, the extra A is a log move and the missing B a model move. We count both move types for each of the 54 activities, so every trace becomes 108 numbers. Three: a trace is slow above 14 days, close to the median. A decision tree is trained on 75 percent of the traces, tuned by grid search with five fold cross validation. Four: every leaf is a rule, and we list the traces satisfying it."
+"We implement the method of Dees and colleagues in four steps. Take this example: the model says A, B, C, but the case did A, A, C. The extra A is a log move, the skipped B is a model move. We count both for each of the 54 activities, so every case becomes 108 numbers. A case over 14 days is slow. A decision tree learns which counts separate slow from fast, and every leaf becomes a rule with a list of traces."
 
-*Cut point if short on time: skip the parameter sentence.*
+**1:15 to 1:45, Evaluation: is it correct? [third block, left]**
 
-**1:25 to 2:25, Evaluation [third block]**
+"First, correctness. On two hand-built toy logs, every alignment and both planted rules matched the hand-derived answer exactly. Then the real log, tested on a 25 percent hold-out against a baseline that calls every case slow."
 
-"Two evaluations. First, correctness: two hand built toy logs with derived move counts and a planted rule. All counts matched and the rules were recovered, precision and recall 1.0. Second, usefulness on the real log: a 25 percent hold-out, F1 of the slow class against an all-slow baseline. Seed 0 gives two rules and F1 0.712. The baseline just predicts every trace slow. Over four seeds the mean is 0.688 against 0.680 for the baseline, and the tree size jumps between 2 and 14 rules. The two rule tree splits on an extra suspension of W-Call-after-offers: 57 percent of those traces are slow, against 16 percent without it. At 18 and 21 days only balanced class weights beat the baseline."
+**1:45 to 2:30, What we found [third block, tree]**
 
-*Cut point: drop the 18 and 21 day sentence.*
+"The tree has one rule. The process allows the call after the offers to be paused once. Cases where it was paused an extra time are slow in 57 percent of cases. Cases without it are slow in only 16 percent. Before you trust that: 2,704 of the 3,093 cases have the extra pause, and across four data splits the tree barely beats the baseline, F1 0.688 against 0.680. So this is a lead, not proof."
 
-**2:25 to 2:55, Limitations and future work [bottom block]**
+**2:30 to 3:00, Limitations and future work [bottom block]**
 
-"Take-away: the pipeline is correct, but the link between deviations and slow denials is weak and unstable. That suspension occurs in 87 percent of traces, so the net may be too strict. Future work: a regression tree on the continuous throughput time, several optimal alignments per trace, and data-aware checking."
-
-**2:55 to 3:00, Close**
-
-"We are happy to take your questions."
-
-The spoken text is 371 words; time it aloud and adjust.
-
-## Rehearsal rules
-
-* Each member delivers it once with a timer. Target between 2:40 and 3:00. Never exceed 3:00.
-* Do not read from the poster; use the poster as the cue.
-* Speak numbers slowly: 0.712, 0.688, 0.680.
-* If the audience asks something early, answer it fully and skip to the next block, using the cut points.
+"Why so weak? Not one case is deviation-free, half of all deviations are pauses and resumes that the process model does not describe, and alignments cannot see waiting time. In one sentence: when the follow-up call after an offer is interrupted more than the process allows, denials take longer. Next, we would use a Petri net that allows repeated pauses, so a second pause is no longer counted as a deviation, and time-aware features, such as the days waited after a pause. Thank you, we are happy to take your questions."
 
 ## Q&A sheet
 
