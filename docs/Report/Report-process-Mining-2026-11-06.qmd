@@ -1,9 +1,16 @@
 ---
 title: "Conformance Checking for Process Improvement"
-author: "Group 8: Rick de Rijk, Thom Verzantvoort, Stefan Vonk, Tycho van Rooij"
+author:
+  - Rick de Rijk
+  - Thom Verzantvoort
+  - Stefan Vonk
+  - Tycho van Rooij
 subtitle: "JM0211 Process Mining"
 format:
   pdf:
+    template-partials:
+      - before-body.tex
+      - toc.tex
     include-in-header:
       text: |
         \usepackage{placeins}
@@ -15,13 +22,13 @@ geometry:
 editor: visual
 toc: true
 lof: true
+fontsize: 11pt
 number-sections: true
 bibliography: references.bib
 link-citations: true
 indent: true
 ---
 
-\newpage
 
 # Motivation and Scientific Background {#sec-motivation}
 
@@ -53,7 +60,7 @@ flowchart LR
   C --> D["3 Classification<br/>tree"]
   D --> E["4 Rules<br/>+ trace sets"]
 ```
-
+\clearpage
 ## The Pipeline {#sec-kpi}
 
 **Step 1: KPI definition and enrichment:** The first step attaches a key performance indicator (KPI) to every trace, so that deviations can later be related to how long a case takes. The brief prescribes throughput time. For a trace $\sigma$, it is the elapsed time between the first and the last event [@Dees2017]:
