@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Poster Group 8: Conformance Checking for Process Improvement</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+@page { size: 420mm 594mm; margin: 0; }
+:root{--ink:#1b1b1b;--muted:#555;--maroon:#6b2e2a;--blue:#2f6f8f;--orange:#d9622b;--line:#cfc9c2}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#fff}
+body{font-family:"Segoe UI",Arial,Helvetica,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.poster{width:420mm;height:594mm;margin:0 auto;overflow:hidden;display:flex;flex-direction:column;
+  padding:26px 38px 12px;gap:7px;font-size:32px;line-height:1.2}
+svg{display:block;width:100%;height:auto}
+/* header */
+.head{display:grid;grid-template-columns:0.75fr 4fr 0.95fr;gap:16px;align-items:center;border-bottom:6px solid var(--maroon);padding-bottom:12px}
+.head .course{font-weight:700;font-size:27px;color:var(--maroon)}
+.head h1{font-size:46px;text-align:center;line-height:1.05;white-space:nowrap}
+.head .who{text-align:center;font-size:29px;margin-top:8px}
+.head img{height:78px;max-width:100%;justify-self:end;display:block;margin-left:auto}
+/* sections */
+section{border:3px solid var(--line);border-radius:12px;display:flex;flex-direction:column}
+section>h2{background:var(--maroon);color:#fff;font-size:40px;text-align:center;padding:2px 10px;border-radius:9px 9px 0 0}
+.body{padding:12px 24px;flex:1;display:flex;flex-direction:column;gap:10px;justify-content:space-around}
+.grow{flex:1 0 auto}
+h3{font-size:34px;color:var(--maroon);line-height:1.1}
+.big{font-size:44px;font-weight:800;line-height:1.1}
+.q{font-size:38px;font-weight:800;line-height:1.12;color:var(--ink)}
+.q em{font-style:normal;color:var(--orange)}
+.sub{font-size:29px;color:var(--muted)}
+/* s1 */
+.s1g{display:grid;grid-template-columns:0.95fr 1.05fr;gap:30px;align-items:center}
+/* s2 */
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch}
+.st{position:relative;text-align:center;padding:0 14px}
+.st+.st::before{content:"";position:absolute;left:-16px;top:40px;border:16px solid transparent;border-left:22px solid var(--maroon)}
+.st svg{height:70px;width:auto;margin:0 auto 6px}
+.st b{display:block;font-size:33px;color:var(--maroon)}
+.st span{display:block;font-size:28px;line-height:1.15}
+.st .n{display:inline-block;width:42px;height:42px;border-radius:50%;background:var(--maroon);color:#fff;font-size:28px;line-height:42px;margin-right:6px}
+.alg{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center;border-top:3px solid var(--line);padding-top:14px}
+table.al{border-collapse:separate;border-spacing:6px}
+.al td{background:#eee;text-align:center;padding:6px 12px;font-size:29px;border-radius:6px;white-space:nowrap}
+.al td.k{background:none;font-weight:800;text-align:right;color:var(--maroon)}
+.al td.lm{background:var(--orange);color:#1b1b1b;font-weight:800}
+.al td.gap{background:#fff;box-shadow:inset 0 0 0 3px var(--orange);font-weight:800}
+.al td.ok{background:#dfe9df}
+.al td.mm{background:var(--blue);color:#fff;font-weight:800}
+.al td.gapm{background:#fff;box-shadow:inset 0 0 0 3px var(--blue);font-weight:800}
+.legend{display:flex;flex-direction:column;gap:12px;font-size:29px}
+.chip{display:inline-block;border-radius:6px;padding:0 10px;font-weight:800}
+.chip.lm{background:var(--orange)} .chip.mm{background:var(--blue);color:#fff}
+/* s3 */
+.ev{display:grid;grid-template-columns:0.82fr 1.18fr;gap:30px}
+.ev>div+div{border-left:3px solid var(--line);padding-left:28px}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:27px;white-space:nowrap}
+.res>div{border:2px solid var(--line);border-radius:10px;padding:8px 10px;text-align:center}
+.res b{display:block;font-size:42px;font-weight:800;line-height:1.05}
+.check{display:grid;grid-template-columns:auto 2px 1fr;align-items:center;gap:22px;margin-top:auto;padding-top:20px}
+.verdict{font-size:34px;font-weight:800;line-height:1.15;white-space:nowrap;color:var(--ink)}
+.verdict svg{width:44px;height:44px;display:inline-block;vertical-align:-6px;margin-right:4px}
+.vline{align-self:stretch;background:var(--line)}
+.ev>div:first-child{display:flex;flex-direction:column}
+.tick{width:84px;height:84px;flex:none}
+.toy{width:100%;margin:18px 0 0;display:block}
+.finding{border-top:3px solid var(--line);padding-top:14px}
+.take{background:var(--maroon);color:#fff;border-radius:10px;padding:10px 18px;font-size:34px;font-weight:700;text-align:center}
+/* s4 */
+.s4g{display:grid;grid-template-columns:1.12fr 0.88fr;gap:30px;align-items:center}
+.fw{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.fw div{border:3px solid var(--maroon);border-radius:10px;padding:6px 10px;font-size:27px;font-weight:700;line-height:1.15;text-align:center;display:flex;align-items:center;justify-content:center;min-height:62px}
+footer{font-size:24px;color:var(--muted);border-top:3px solid var(--line);padding-top:6px;white-space:nowrap;overflow:hidden}
+</style>
+</head>
+<body>
+<div class="poster">
+
+<header class="head">
+  <div class="course">JM0211<br>Process Mining</div>
+  <div>
+    <h1>Conformance Checking for Process Improvement</h1>
+    <div class="who"><b>Group 8:</b> Rick de Rijk, Thom Verzantvoort, Stefan Vonk, Tycho van Rooij</div>
+  </div>
+  <img src="figures/jads_logo.png" alt="JADS logo">
+</header>
+
+<section>
+  <h2>Motivation and Scientific Background</h2>
+  <div class="body">
+    <div class="s1g">
+      <div>
+        <div class="sub" style="text-align:center;white-space:nowrap">BPI 2017 &middot; Dutch bank &middot; <b>3,093 denied loans</b></div>
+        <svg viewBox="0 0 700 226" font-family="Segoe UI, Arial, Helvetica, sans-serif"><defs><marker id="ah" markerUnits="userSpaceOnUse" markerWidth="22" markerHeight="22" refX="18" refY="11" orient="auto"><path d="M0,0 L22,11 L0,22 z" fill="#6b2e2a"/></marker></defs><line x1="124" x2="180" y1="80" y2="80" stroke="#6b2e2a" stroke-width="5" marker-end="url(#ah)"/><line x1="302" x2="390" y1="80" y2="80" stroke="#6b2e2a" stroke-width="5" marker-end="url(#ah)"/><line x1="512" x2="578" y1="80" y2="80" stroke="#6b2e2a" stroke-width="5" marker-end="url(#ah)"/><circle cx="62" cy="80" r="56" fill="#fff" stroke="#6b2e2a" stroke-width="5"/><rect x="42" y="52" width="40" height="54" rx="4" fill="none" stroke="#6b2e2a" stroke-width="5"/><line x1="51" x2="73" y1="66" y2="66" stroke="#6b2e2a" stroke-width="4"/><line x1="51" x2="73" y1="78" y2="78" stroke="#6b2e2a" stroke-width="4"/><line x1="51" x2="73" y1="90" y2="90" stroke="#6b2e2a" stroke-width="4"/><text x="62" y="180" font-size="29" font-weight="700" fill="#1b1b1b" text-anchor="middle">Apply</text><circle cx="240" cy="80" r="56" fill="#fff" stroke="#6b2e2a" stroke-width="5"/><rect x="210" y="58" width="60" height="42" rx="4" fill="none" stroke="#6b2e2a" stroke-width="5"/><polyline points="210,60 240,84 270,60" fill="none" stroke="#6b2e2a" stroke-width="5"/><text x="240" y="180" font-size="29" font-weight="700" fill="#1b1b1b" text-anchor="middle">Offer sent</text><circle cx="450" cy="80" r="56" fill="#fff" stroke="#6b2e2a" stroke-width="5"/><rect x="430" y="54" width="13" height="52" rx="3" fill="#6b2e2a"/><rect x="457" y="54" width="13" height="52" rx="3" fill="#6b2e2a"/><text x="450" y="180" font-size="29" font-weight="700" fill="#1b1b1b" text-anchor="middle">Follow-up call</text><circle cx="638" cy="80" r="56" fill="#6b2e2a" stroke="#6b2e2a" stroke-width="5"/><path d="M616,58 L660,102 M660,58 L616,102" stroke="#fff" stroke-width="9" stroke-linecap="round"/><text x="638" y="180" font-size="29" font-weight="700" fill="#1b1b1b" text-anchor="middle">Denied</text><text x="450" y="216" font-size="27" fill="#d9622b" font-weight="700" text-anchor="middle">often paused</text></svg>
+        <div class="q">Which deviations from the process go with <em>slow</em> denials?</div>
+      </div>
+      <div><svg viewBox="0 0 900 360" font-family="Segoe UI, Arial, Helvetica, sans-serif"><line x1="70" x2="880" y1="282.0" y2="282.0" stroke="#e4e1dc" stroke-width="2"/><text x="60" y="291.0" font-size="26" fill="#555" text-anchor="end">0</text><line x1="70" x2="880" y1="179.1" y2="179.1" stroke="#e4e1dc" stroke-width="2"/><text x="60" y="188.1" font-size="26" fill="#555" text-anchor="end">200</text><line x1="70" x2="880" y1="76.3" y2="76.3" stroke="#e4e1dc" stroke-width="2"/><text x="60" y="85.3" font-size="26" fill="#555" text-anchor="end">400</text><rect x="71.5" y="254.7" width="23.1" height="27.3" fill="#2f6f8f"/><rect x="97.6" y="258.3" width="23.1" height="23.7" fill="#2f6f8f"/><rect x="123.8" y="254.7" width="23.1" height="27.3" fill="#2f6f8f"/><rect x="149.9" y="171.9" width="23.1" height="110.1" fill="#2f6f8f"/><rect x="176.0" y="103.0" width="23.1" height="179.0" fill="#2f6f8f"/><rect x="202.1" y="90.7" width="23.1" height="191.3" fill="#2f6f8f"/><rect x="228.3" y="68.6" width="23.1" height="213.4" fill="#2f6f8f"/><rect x="254.4" y="121.5" width="23.1" height="160.5" fill="#d9622b"/><rect x="280.5" y="155.5" width="23.1" height="126.5" fill="#d9622b"/><rect x="306.7" y="191.0" width="23.1" height="91.0" fill="#d9622b"/><rect x="332.8" y="188.4" width="23.1" height="93.6" fill="#d9622b"/><rect x="358.9" y="226.5" width="23.1" height="55.5" fill="#d9622b"/><rect x="385.0" y="234.2" width="23.1" height="47.8" fill="#d9622b"/><rect x="411.2" y="231.6" width="23.1" height="50.4" fill="#d9622b"/><rect x="437.3" y="244.5" width="23.1" height="37.5" fill="#d9622b"/><rect x="463.4" y="251.1" width="23.1" height="30.9" fill="#d9622b"/><rect x="489.6" y="254.2" width="23.1" height="27.8" fill="#d9622b"/><rect x="515.7" y="263.0" width="23.1" height="19.0" fill="#d9622b"/><rect x="541.8" y="270.2" width="23.1" height="11.8" fill="#d9622b"/><rect x="568.0" y="268.1" width="23.1" height="13.9" fill="#d9622b"/><rect x="594.1" y="271.2" width="23.1" height="10.8" fill="#d9622b"/><rect x="620.2" y="274.8" width="23.1" height="7.2" fill="#d9622b"/><rect x="646.3" y="276.3" width="23.1" height="5.7" fill="#d9622b"/><rect x="672.5" y="275.3" width="23.1" height="6.7" fill="#d9622b"/><rect x="698.6" y="277.9" width="23.1" height="4.1" fill="#d9622b"/><rect x="724.7" y="278.9" width="23.1" height="3.1" fill="#d9622b"/><rect x="750.9" y="281.0" width="23.1" height="1.0" fill="#d9622b"/><rect x="777.0" y="279.9" width="23.1" height="2.1" fill="#d9622b"/><rect x="803.1" y="279.9" width="23.1" height="2.1" fill="#d9622b"/><rect x="829.2" y="280.5" width="23.1" height="1.5" fill="#d9622b"/><rect x="855.4" y="273.8" width="23.1" height="8.2" fill="#d9622b"/><line x1="252.9" x2="252.9" y1="36" y2="282" stroke="#1b1b1b" stroke-width="4" stroke-dasharray="12 8"/><text x="264.9" y="58" font-size="28" font-weight="700" fill="#1b1b1b">14 days</text><text x="161.5" y="30" font-size="34" font-weight="800" fill="#2f6f8f" text-anchor="middle">fast</text><text x="161.5" y="62" font-size="28" font-weight="700" fill="#2f6f8f" text-anchor="middle">1,501</text><text x="566.5" y="106" font-size="34" font-weight="800" fill="#d9622b" text-anchor="middle">slow  1,592</text><text x="70.0" y="316" font-size="26" fill="#555" text-anchor="middle">0</text><text x="252.9" y="316" font-size="26" fill="#555" text-anchor="middle">14</text><text x="461.9" y="316" font-size="26" fill="#555" text-anchor="middle">30</text><text x="657.9" y="316" font-size="26" fill="#555" text-anchor="middle">45</text><text x="866.9" y="316" font-size="26" fill="#555" text-anchor="middle">60+</text><text x="475.0" y="354" font-size="28" fill="#1b1b1b" text-anchor="middle">days from application to denial (up to 260)</text><line x1="70" x2="880" y1="282" y2="282" stroke="#1b1b1b" stroke-width="3"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Explanation of Conceptual Approach</h2>
+  <div class="body">
+    <div class="pipe">
+      <div class="st"><svg viewBox="0 0 120 90"><rect x="6" y="8" width="44" height="60" rx="4" fill="none" stroke="#6b2e2a" stroke-width="5"/>
+      <line x1="15" x2="41" y1="24" y2="24" stroke="#6b2e2a" stroke-width="4"/><line x1="15" x2="41" y1="36" y2="36" stroke="#6b2e2a" stroke-width="4"/><line x1="15" x2="41" y1="48" y2="48" stroke="#6b2e2a" stroke-width="4"/>
+      <circle cx="68" cy="58" r="11" fill="none" stroke="#6b2e2a" stroke-width="5"/><rect x="85" y="47" width="14" height="22" fill="#6b2e2a"/><circle cx="110" cy="58" r="7" fill="none" stroke="#6b2e2a" stroke-width="4"/>
+      <line x1="79" x2="85" y1="58" y2="58" stroke="#6b2e2a" stroke-width="4"/><line x1="99" x2="103" y1="58" y2="58" stroke="#6b2e2a" stroke-width="4"/></svg><b>Input</b><span>event log + Petri net</span></div>
+      <div class="st"><svg viewBox="0 0 120 90"><circle cx="60" cy="46" r="36" fill="none" stroke="#6b2e2a" stroke-width="6"/>
+      <line x1="60" x2="60" y1="46" y2="22" stroke="#6b2e2a" stroke-width="6" stroke-linecap="round"/><line x1="60" x2="78" y1="46" y2="56" stroke="#6b2e2a" stroke-width="6" stroke-linecap="round"/></svg><b><span class="n">1</span>KPI</b><span>days per case</span></div>
+      <div class="st"><svg viewBox="0 0 120 90"><g fill="#ddd" stroke="#6b2e2a" stroke-width="3">
+      <rect x="6" y="14" width="24" height="24"/><rect x="34" y="14" width="24" height="24" fill="#d9622b"/><rect x="62" y="14" width="24" height="24"/><rect x="90" y="14" width="24" height="24"/>
+      <rect x="6" y="50" width="24" height="24"/><rect x="62" y="50" width="24" height="24" fill="#2f6f8f"/><rect x="90" y="50" width="24" height="24"/></g>
+      <text x="46" y="70" font-size="22" font-weight="800" fill="#6b2e2a" text-anchor="middle" font-family="Segoe UI, Arial, Helvetica, sans-serif">&#187;</text></svg><b><span class="n">2</span>Align</b><span>count deviations</span></div>
+      <div class="st"><svg viewBox="0 0 120 90"><rect x="40" y="4" width="40" height="24" rx="5" fill="#6b2e2a"/>
+      <path d="M60,28 V40 M30,40 H90 M30,40 V54 M90,40 V54" stroke="#6b2e2a" stroke-width="5" fill="none"/>
+      <rect x="8" y="54" width="44" height="28" rx="5" fill="#2f6f8f"/><rect x="68" y="54" width="44" height="28" rx="5" fill="#d9622b"/></svg><b><span class="n">3</span>Tree</b><span>slow vs fast</span></div>
+      <div class="st"><svg viewBox="0 0 120 90"><g stroke-width="5" stroke-linecap="round">
+      <circle cx="18" cy="22" r="7" fill="#2f6f8f"/><line x1="36" x2="108" y1="22" y2="22" stroke="#6b2e2a"/>
+      <circle cx="18" cy="46" r="7" fill="#d9622b"/><line x1="36" x2="96" y1="46" y2="46" stroke="#6b2e2a"/>
+      <circle cx="18" cy="70" r="7" fill="#a9a79f"/><line x1="36" x2="88" y1="70" y2="70" stroke="#6b2e2a"/></g></svg><b>Output</b><span>rules + cases</span></div>
+    </div>
+    <div class="alg">
+      <table class="al">
+        <tr><td class="k">Case</td><td>Call paused</td><td class="gap">Call paused</td><td class="gapm">&gt;&gt;</td><td>Denied</td></tr>
+        <tr><td class="k">Model</td><td>Call paused</td><td class="gap">&gt;&gt;</td><td class="gapm">Call resumed</td><td>Denied</td></tr>
+        <tr><td class="k"></td><td class="ok">&#10003;</td><td class="lm">log move</td><td class="mm">model move</td><td class="ok">&#10003;</td></tr>
+      </table>
+      <div class="legend">
+        <div><span class="chip lm">log move</span> extra step in the case</div>
+        <div><span class="chip mm">model move</span> step the case skipped</div>
+        <div class="sub">One case &rarr; 108 deviation counts &rarr; tree</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="grow">
+  <h2>Evaluation Design and Results</h2>
+  <div class="body">
+    <div class="ev">
+      <div>
+        <h3>&#9312; Is it correct?</h3>
+        <div class="sub">Toy logs, solved by hand first</div>
+        <img class="toy" src="figures/toy_net_parallel.png" alt="Toy Petri net with parallel block and choice">
+        <div class="check">
+          <div class="verdict"><svg viewBox="0 0 40 40"><path d="M8,21 l8,8 l16,-18" stroke="#3d7a4a" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Yes,<br>exact match</div>
+          <div class="vline"></div>
+          <div class="res"><div><b>11 / 11</b>alignments</div><div><b>2 / 2</b>planted rules</div></div>
+        </div>
+      </div>
+      <div>
+        <h3>&#9313; Is it useful? Barely better than guessing</h3>
+        <div class="sub">4 runs: trained on a random 75%, tested on the other 25%</div>
+        <svg viewBox="0 0 740 258" font-family="Segoe UI, Arial, Helvetica, sans-serif"><line x1="40" x2="710" y1="138" y2="138" stroke="#d8d4ce" stroke-width="4"/><line x1="40.0" x2="40.0" y1="130" y2="146" stroke="#555" stroke-width="3"/><text x="40.0" y="176" font-size="26" fill="#555" text-anchor="start">0.60</text><line x1="710.0" x2="710.0" y1="130" y2="146" stroke="#555" stroke-width="3"/><text x="710.0" y="176" font-size="26" fill="#555" text-anchor="end">0.75</text><text x="375.0" y="250" font-size="27" fill="#1b1b1b" text-anchor="middle">F1 score for slow cases (higher is better)</text><line x1="397.3" x2="397.3" y1="10" y2="172" stroke="#a9a79f" stroke-width="6" stroke-dasharray="14 8"/><text x="383.3" y="32" font-size="27" fill="#555" text-anchor="end">Guess "every case slow"</text><text x="383.3" y="66" font-size="32" font-weight="800" fill="#555" text-anchor="end">0.680</text><path d="M397.3,98 H433.1 M397.3,89 v18 M433.1,89 v18" stroke="#d9622b" stroke-width="4" fill="none"/><circle cx="540.3" cy="138" r="17" fill="#2f6f8f" fill-opacity="0.7"/><circle cx="312.5" cy="138" r="17" fill="#2f6f8f" fill-opacity="0.7"/><circle cx="316.9" cy="138" r="17" fill="#2f6f8f" fill-opacity="0.7"/><circle cx="558.1" cy="138" r="17" fill="#2f6f8f" fill-opacity="0.7"/><text x="314.7" y="184" font-size="25" fill="#2f6f8f" font-weight="700" text-anchor="middle">2 runs</text><text x="314.7" y="209" font-size="25" fill="#2f6f8f" text-anchor="middle">11-14 rules</text><text x="549.2" y="184" font-size="25" fill="#2f6f8f" font-weight="700" text-anchor="middle">2 runs</text><text x="549.2" y="209" font-size="25" fill="#2f6f8f" text-anchor="middle">2 rules</text><path d="M433.1,110 l16,28 l-16,28 l-16,-28 z" fill="#6b2e2a"/><text x="455.1" y="104" font-size="30" font-weight="800" fill="#6b2e2a">Tree average 0.688</text></svg>
+      </div>
+    </div>
+    <div class="finding">
+      <h3>Main finding: was the follow-up call paused more often than the model allows?</h3>
+      <svg viewBox="0 0 1460 206" font-family="Segoe UI, Arial, Helvetica, sans-serif"><text x="10" y="58" font-size="40" font-weight="800" fill="#1b1b1b">No</text><text x="100" y="58" font-size="32" fill="#1b1b1b">389 cases</text><rect x="360" y="10" width="689.6" height="70" fill="#2f6f8f"/><rect x="1049.6" y="10" width="130.4" height="70" fill="#d9622b"/><text x="1198" y="60" font-size="42" font-weight="800" fill="#d9622b">16% slow</text><text x="376" y="58" font-size="30" font-weight="700" fill="#fff">84% fast</text><text x="10" y="142" font-size="40" font-weight="800" fill="#1b1b1b">Yes</text><text x="100" y="142" font-size="32" fill="#1b1b1b">2,704 cases</text><rect x="360" y="94" width="355.9" height="70" fill="#2f6f8f"/><rect x="715.9" y="94" width="464.1" height="70" fill="#d9622b"/><text x="1198" y="144" font-size="42" font-weight="800" fill="#d9622b">57% slow</text><text x="376" y="142" font-size="30" font-weight="700" fill="#fff">43% fast</text><line x1="757.7" x2="757.7" y1="2" y2="176" stroke="#1b1b1b" stroke-width="4" stroke-dasharray="12 8"/><text x="757.7" y="203" font-size="27" fill="#1b1b1b" text-anchor="middle">all cases: 51.5% slow</text></svg>
+    </div>
+    <div class="take">Correct on the toy logs &middot; but only +0.008 F1 over guessing &rarr; a lead, not proof</div>
+  </div>
+</section>
+
+<section>
+  <h2>Limitations and Future Work</h2>
+  <div class="body">
+    <div class="s4g">
+      <div>
+        <h3>Why so weak? Every case deviates</h3>
+        <svg viewBox="0 0 860 258" font-family="Segoe UI, Arial, Helvetica, sans-serif"><text x="316" y="35" font-size="28" font-weight="800" fill="#1b1b1b" text-anchor="end">Any deviation</text><rect x="330" y="6" width="430" height="36" fill="#eee"/><rect x="330" y="6" width="430.0" height="36" fill="#6b2e2a"/><text x="772" y="35" font-size="29" font-weight="800" fill="#1b1b1b">100%</text><text x="316" y="81" font-size="28" font-weight="400" fill="#1b1b1b" text-anchor="end">Offer returned</text><rect x="330" y="52" width="430" height="36" fill="#eee"/><rect x="330" y="52" width="405.5" height="36" fill="#b07a72"/><text x="772" y="81" font-size="29" font-weight="800" fill="#1b1b1b">94%</text><text x="316" y="127" font-size="28" font-weight="400" fill="#1b1b1b" text-anchor="end">Offer refused</text><rect x="330" y="98" width="430" height="36" fill="#eee"/><rect x="330" y="98" width="398.0" height="36" fill="#b07a72"/><text x="772" y="127" font-size="29" font-weight="800" fill="#1b1b1b">93%</text><text x="316" y="173" font-size="28" font-weight="400" fill="#1b1b1b" text-anchor="end">Application denied</text><rect x="330" y="144" width="430" height="36" fill="#eee"/><rect x="330" y="144" width="392.5" height="36" fill="#b07a72"/><text x="772" y="173" font-size="29" font-weight="800" fill="#1b1b1b">91%</text><text x="316" y="219" font-size="28" font-weight="400" fill="#1b1b1b" text-anchor="end">Extra pause of call</text><rect x="330" y="190" width="430" height="36" fill="#eee"/><rect x="330" y="190" width="375.9" height="36" fill="#b07a72"/><text x="772" y="219" font-size="29" font-weight="800" fill="#1b1b1b">87%</text><text x="330" y="254" font-size="25" fill="#555">share of the 3,093 cases with this deviation</text></svg>
+      </div>
+      <div>
+        <div class="q" style="font-size:34px">Model too strict: deviations are <em>normal</em>, so they hardly tell slow from fast.</div>
+        <div class="fw">
+          <div>Net that allows repeated pauses</div>
+          <div>Add waiting-time features</div>
+          <div>Predict days, not a cutoff</div>
+          <div>Also check data (loan amount)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer><b>References:</b> Dees, de Leoni, Mannhardt (2017). van der Aalst (2016) Process Mining. Berti et al. (2019) PM4Py. van Dongen (2017).</footer>
+</div>
+</body>
+</html>
