@@ -47,6 +47,7 @@ These check a stage, inspect the log, or run the experiments of the report. They
 
 | Path | What it does |
 |---|---|
+| `scripts/reproduce_all.py` | Runs the whole chain (alignment, locked result, stability, cutoff comparison, merge variants, figure, optionally the toys) into `data/output/reproduced/` and compares every file with the stored result. |
 | `scripts/inspect_log.py` | Prints the size, the activity families, and the share of applications that contain each activity. Saves a histogram of events per application. |
 | `scripts/inspect_throughput.py` | Prints min, median, and max throughput in days. Saves a histogram and a boxplot. |
 | `scripts/fit_tree.py` | Fits the tree from `data/output/alignment_encodings.csv` for a cutoff you pass in. |

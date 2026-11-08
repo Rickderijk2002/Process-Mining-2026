@@ -109,39 +109,52 @@ The gold standards are `data/gold/toy_alignment_gold.csv` and `data/gold/toy_par
 
 ## Reproducing the reported results
 
-The tables of the short paper come from these steps, in this order. [docs/results.md](docs/results.md) lists the numbers they should give.
+One command runs the whole chain and checks it against the stored results:
 
-1. Align the full log once. This writes `data/output/alignment_encodings.csv`, which every later step reuses (several minutes):
+```bash
+python scripts/reproduce_all.py
+```
 
-   ```bash
-   python src/main.py --cutoff 14
-   ```
+It takes several minutes, mostly the alignment of all 3,093 traces and the cutoff comparison. It writes everything to `data/output/reproduced/` (not tracked by git), so the stored results are never overwritten. At the end it compares each new file with the stored one and prints `identical` or `DIFFERENT` per file. [docs/results.md](docs/results.md) lists the numbers the files should contain.
 
-2. Refit the locked cutoff 14 result (seed 0) into fresh files:
+| Option | Effect |
+|---|---|
+| `--skip-align` | Reuse the stored `data/output/alignment_encodings.csv` instead of aligning again (much faster). |
+| `--sample 50` | Quick check: align the first 50 traces and fit one tree. Nothing is compared. |
+| `--toys` | Also run both toy validations of the section above. |
+| `--out-dir PATH` | Write the new files somewhere else. |
 
-   ```bash
-   python scripts/fit_tree.py --cutoff 14 --random-state 0 --output data/output/tree_rules_cutoff14_pruned_rerun.csv --export-cases data/output/tree_rule_cases_cutoff14_pruned_rerun.csv
-   ```
+The steps, in order, and the script behind each:
 
-3. Check the stability over the seeds 0 to 3. The script refuses to overwrite an existing output file:
+1. Align every trace and fit the first tree: `src/main.py --cutoff 14`
+2. Refit the locked cutoff 14 result, seed 0: `scripts/fit_tree.py`
+3. Stability over the seeds 0 to 3: `scripts/check_tree_stability.py`
+4. Cutoff comparison 14, 18 and 21: `scripts/compare_cutoffs.py`
+5. Lifecycle merge, pause and execution: `scripts/compare_cutoffs.py --merge`
+6. Lifecycle merge, one column per task: `scripts/compare_cutoffs_merge_all.py`
+7. The F1 per cutoff figure of the report: `scripts/plot_cutoff_comparison.py`
 
-   ```bash
-   python scripts/check_tree_stability.py --cutoff 14 --seeds 0 1 2 3 --output data/output/tree_stability_cutoff14_pruned_rerun.csv
-   ```
+Each script can also be run on its own, with its own options (`--help`).
 
-4. Compare the cutoffs 14, 18 and 21, then draw the F1 figure:
+**Aligning again can change a few traces.** The reported results are defined by the stored `data/output/alignment_encodings.csv`. With `--skip-align`, steps 2 to 7 reproduce every stored result file exactly (checked: 13 of 13 files identical). If you align again (the default), about 14 of the 3,093 traces (0.5%) can come out differently: for those traces the Petri net allows several optimal alignments of equal cost, the solver picks one of them, and repeated runs may pick another. The total number of moves stays the same, but a few downstream numbers shift (for example the seed 1 tree of the stability check, or the mean number of rules in the cutoff comparison). The stored encoding is the reference for the report.
 
-   ```bash
-   python scripts/compare_cutoffs.py
-   python scripts/plot_cutoff_comparison.py
-   ```
+## Which script is for what
 
-5. Lifecycle merge experiment of the appendix:
-
-   ```bash
-   python scripts/compare_cutoffs.py --merge
-   python scripts/compare_cutoffs_merge_all.py
-   ```
+| Script | Purpose | In `reproduce_all.py` |
+|---|---|---|
+| `src/main.py` | The pipeline itself: throughput, alignments, encoding, tree, rules | step 1 |
+| `scripts/fit_tree.py` | Refit the tree for a cutoff from the saved encoding table | step 2 |
+| `scripts/check_tree_stability.py` | Fixed-grid cutoff 14 search over several seeds (report, stability table) | step 3 |
+| `scripts/compare_cutoffs.py` | Cutoff, seed and class-weight comparison (report, results tables); `--merge` for the lifecycle merge | steps 4 and 5 |
+| `scripts/compare_cutoffs_merge_all.py` | Lifecycle merge into one column per task (report appendix) | step 6 |
+| `scripts/plot_cutoff_comparison.py` | F1 per cutoff figure of the report | step 7 |
+| `scripts/make_toy.py`, `align_toy.py`, `check_toy_rules.py` | Linear toy: write it, align it, recover the planted rule | with `--toys` |
+| `scripts/make_toy_parallel.py`, `align_toy_parallel.py`, `check_toy_parallel_rules.py` | Parallel toy with a choice, same three steps | with `--toys` |
+| `scripts/evaluate_toy_alignments.py` | Alignments of either toy against the hand-written gold standard | with `--toys` |
+| `scripts/make_gold_appendix.py` | Builds the toy nets figure and the gold table for the report appendix | no, it writes into `docs/Report/` |
+| `scripts/inspect_log.py`, `scripts/inspect_throughput.py` | Look at the log and the throughput distribution (histograms) | no, inspection only |
+| `scripts/spike_simpn_export.py` | Experiment: can SimPN export an event log for the parallel toy? See [docs/toy_parallel.md](docs/toy_parallel.md) | no, a one-off spike |
+| `docs/poster/build_poster_v7.py` | Builds the poster HTML from the encoding table | no, see below |
 
 ## Report and poster
 

@@ -4,6 +4,8 @@ This note records the results of the classification step on the BPIC 2017 Denied
 
 All commands run from the project root. With pip instead of uv, write `python` instead of `uv run python`.
 
+All numbers in this note come from the stored encoding table `data/output/alignment_encodings.csv`. `python scripts/reproduce_all.py --skip-align` regenerates every result file from it and reports them as identical. A fresh alignment can differ on about 14 of the 3,093 traces, because a trace can have several optimal alignments of equal cost (see the README), and that shifts some of the numbers below slightly.
+
 ## 1. Locked result at cutoff 14
 
 ### Cutoff and fixed search protocol
