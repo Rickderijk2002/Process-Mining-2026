@@ -10,3 +10,7 @@ data/raw/*
 # Quarto intermediates (keep .qmd and final .pdf)
 docs/Report/*.tex
 docs/Report/*_files/
+
+# Un-ignore before-body.tex and toc.tex, as they are needed for the report to compile correctly
+!docs/Report/before-body.tex
+!docs/Report/toc.tex
