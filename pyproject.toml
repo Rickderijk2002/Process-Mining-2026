@@ -5,10 +5,10 @@ description = "JM0211 Process Mining, Group 8: deviation analysis via conformanc
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "ipykernel>=7.3.0",
     "matplotlib>=3.11.1",
+    "numpy>=2.5.3",
     "pandas>=3.0.5",
     "pm4py>=2.7.23.8",
-    "scikit-learn>=1.5.0",
+    "scikit-learn>=1.9.1",
     "simpn>=1.10.0",
 ]
