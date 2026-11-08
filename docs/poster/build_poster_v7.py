@@ -2,13 +2,13 @@
 
 All numbers come from the report (docs/Report/Report-process-Mining-2026-11-06.qmd)
 or are recomputed from data/output/alignment_encodings.csv.
-Run:  .venv/bin/python poster/build_poster_v7.py
+Run:  python docs/poster/build_poster_v7.py   (from the project root)
 """
 import csv
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "poster" / "poster_v7.html"
+ROOT = Path(__file__).resolve().parents[2]
+OUT = ROOT / "docs" / "poster" / "poster_v7.html"
 
 BLUE, ORANGE, MAROON, GREY, INK, MUTED = "#2f6f8f", "#d9622b", "#6b2e2a", "#a9a79f", "#1b1b1b", "#555"
 FONT = 'font-family="Segoe UI, Arial, Helvetica, sans-serif"'

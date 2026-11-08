@@ -73,6 +73,8 @@ data/output/sample_cases.csv`.
 - `tree_rules.csv`: one row per leaf with the conditions, the predicted class and the number of fast and slow traces.
 - `tree_rule_cases.csv`: one row per trace with the id of the rule it satisfies.
 
+A run creates these files; the repository only holds the locked cutoff 14 result under versioned names (`tree_rules_cutoff14_pruned_2026-10-06.csv` and its two companions, see [docs/results.md](docs/results.md)).
+
 The program also prints the class balance, the selected tree settings and the precision and recall of the slow class on the held-out traces.
 
 To fit the tree again for another cutoff without repeating the alignments, use the saved encoding table:
