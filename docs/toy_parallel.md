@@ -1,23 +1,16 @@
-# The parallel + decision toy (Step 0 — design only)
+# The parallel + decision toy
 
 This is the second gold-standard toy. The first toy (`docs/toy.md`) is a straight line. This one adds what the teacher asked for: **parallelism** and a **decision (XOR)**.
 
-**Status:** Step 0 design approved. Step 1 scripts are in the repo. Run the three commands below from the project root after `make_toy_parallel.py`.
+**Status:** the scripts are in the repo and the gold standard matches (6 of 6 cases). Run the commands below from the project root.
 
 ```bash
 uv run python scripts/make_toy_parallel.py
 uv run python scripts/align_toy_parallel.py
-uv run python scripts/evaluate_toy_alignments.py ^
-  --gold data/gold/toy_parallel_alignment_gold.csv ^
-  --log data/raw/toy_parallel.xes ^
-  --pnml data/raw/toy_parallel.pnml ^
-  --plot data/output/toy_parallel_alignment_gold_vs_pred.png ^
-  --title "Parallel toy: gold vs predicted"
+uv run python scripts/evaluate_toy_alignments.py --gold data/gold/toy_parallel_alignment_gold.csv --log data/raw/toy_parallel.xes --pnml data/raw/toy_parallel.pnml --plot data/output/toy_parallel_alignment_gold_vs_pred.png --title "Parallel toy: gold vs predicted"
 ```
 
-On PowerShell use backticks instead of `^` for line continuation, or paste as one line.
-
-`make_toy_parallel.py` writes PNML + XES with pm4py (same style as the linear toy). SimPN can replace how the *fitting* log is generated later; the hand gold CSV stays the source of truth.
+`make_toy_parallel.py` writes PNML + XES with pm4py (same style as the linear toy). SimPN can generate the *fitting* log instead (see the spike below); the hand gold CSV stays the source of truth.
 
 ## What you draw
 
@@ -51,7 +44,7 @@ Silent transitions (`tau_*`) fire in the model, never appear in the log, and are
 - `A, B, C, E, F`
 - `A, C, B, E, F`
 
-## Cases we plant (for the gold CSV later)
+## Cases we plant (the gold CSV)
 
 
 | Case | Trace you write down     | What is wrong with it                                      |
@@ -93,13 +86,9 @@ Same rules as `docs/toy.md`:
 | **AND (B \|\| C)** | Checks that the aligner treats either order as fitting, and that skipping one branch is a **model move**. |
 | **XOR (D vs E)** | Checks that either branch alone is fine; both fitting cases use different branches. |
 | **Extra / missing labeled activities** | Same gold idea as toy 1, with unambiguous counts. |
-| **SimPN later** | Step 1 can *simulate* fitting behaviour from this net; deviant cases can still be written by hand into the XES (like toy 1), so the gold stays under your control. |
+| **SimPN** | SimPN can *simulate* fitting behaviour from this net; deviant cases can still be written by hand into the XES (like toy 1), so the gold stays under our control. |
 
-## What we do **not** do yet
-
-- Nothing blocking for Rick’s gold lane. Optional extras only if you want more practise.
-
-## Optional: planted rule (practise)
+## Planted rule
 
 ```bash
 uv run python scripts/check_toy_parallel_rules.py
@@ -109,7 +98,7 @@ Cutoff **10**. Only **p4** is slow (25 days). Hand rule: **extra B** (`log_move_
 p3 still *deviates* (missing C) but stays **good** — deviation ≠ slow. Expect P/R **1.0** and a
 depth-1 split on `log_move_B` (same *kind* of story as the linear toy).
 
-## SimPN export spike (Step 1b)
+## SimPN export spike
 
 Run:
 
@@ -127,4 +116,4 @@ uv run python scripts/spike_simpn_export.py
 | Direct PNML export? | **No usable API.** Keep `make_toy_parallel.py` (pm4py) as the model file for alignments. |
 | Path into our pipeline? | CSV → filter A–F → XES (`data/output/simpn_spike_events.xes`). Fitting traces only; deviant cases stay hand-written in the gold XES. |
 
-So: SimPN is useful as a **fitting-log generator**. The **gold net (PNML)** and the **deviant cases** stay under our control, as in Step 1.
+So: SimPN is useful as a **fitting-log generator**. The **gold net (PNML)** and the **deviant cases** stay under our control, as in the linear toy.

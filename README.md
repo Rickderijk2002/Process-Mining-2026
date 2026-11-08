@@ -105,7 +105,47 @@ python scripts/check_toy_parallel_rules.py
 
 The gold standards are `data/gold/toy_alignment_gold.csv` and `data/gold/toy_parallel_alignment_gold.csv`. The design of both toys is described in `docs/toy.md` and `docs/toy_parallel.md`.
 
-<!-- TODO (after the group decides the headline result): section "Reproducing the reported results" with the exact commands for the cutoff 14 result, the seed stability check (scripts/check_tree_stability.py) and the cutoff comparison (scripts/compare_cutoffs.py). -->
+## Reproducing the reported results
+
+The tables of the short paper come from these steps, in this order. [docs/results.md](docs/results.md) lists the numbers they should give.
+
+1. Align the full log once. This writes `data/output/alignment_encodings.csv`, which every later step reuses (several minutes):
+
+   ```bash
+   python src/main.py --cutoff 14
+   ```
+
+2. Refit the locked cutoff 14 result (seed 0) into fresh files:
+
+   ```bash
+   python scripts/fit_tree.py --cutoff 14 --random-state 0 --output data/output/tree_rules_cutoff14_pruned_rerun.csv --export-cases data/output/tree_rule_cases_cutoff14_pruned_rerun.csv
+   ```
+
+3. Check the stability over the seeds 0 to 3. The script refuses to overwrite an existing output file:
+
+   ```bash
+   python scripts/check_tree_stability.py --cutoff 14 --seeds 0 1 2 3 --output data/output/tree_stability_cutoff14_pruned_rerun.csv
+   ```
+
+4. Compare the cutoffs 14, 18 and 21, then draw the F1 figure:
+
+   ```bash
+   python scripts/compare_cutoffs.py
+   python scripts/plot_cutoff_comparison.py
+   ```
+
+5. Lifecycle merge experiment of the appendix:
+
+   ```bash
+   python scripts/compare_cutoffs.py --merge
+   python scripts/compare_cutoffs_merge_all.py
+   ```
+
+## Report and poster
+
+The short paper is `docs/Report/Report-process-Mining-2026-11-06.qmd`, with the rendered PDF next to it. Rendering needs [Quarto](https://quarto.org) and a LaTeX distribution; `before-body.tex` and `toc.tex` in the same folder are part of the build. The Python environment above is not needed for rendering.
+
+The poster is `docs/poster/Poster_Group8_v7.pdf`. `docs/poster/build_poster_v7.py` rebuilds `poster_v7.html` from `data/output/alignment_encodings.csv`, so run step 1 above first.
 
 ## Project layout
 
@@ -118,8 +158,12 @@ scripts/                 toy validation, stability check, cutoff comparison, ins
 data/source/             event log, Petri net, log description, Dees et al. (2017)
 data/gold/               hand-written gold standards
 data/output/             generated tables and figures
-docs/                    method notes, results records, short paper (docs/Report)
+docs/                    method notes (architecture, pipeline, dataset, toys) and results.md
+docs/Report/             short paper: Quarto source, PDF, bibliography, figures
+docs/poster/             poster: PDF, HTML, build script, figures
 ```
+
+[docs/architecture.md](docs/architecture.md) describes every file in more detail.
 
 ## Data
 
