@@ -28,15 +28,15 @@ balanced,21,0,good,log_move_W-Call-after-offers <= 0.5 AND log_move_W-Call-incom
 balanced,21,1,good,log_move_W-Call-after-offers <= 0.5 AND log_move_W-Call-incomplete-files <= 0.5 AND model_move_W-Complete-application <= 0.5 AND log_move_O-Created > 0.5,29,29,0,0.0
 balanced,21,2,good,log_move_W-Call-after-offers <= 0.5 AND log_move_W-Call-incomplete-files <= 0.5 AND model_move_W-Complete-application > 0.5,166,164,2,0.012
 balanced,21,3,bad,log_move_W-Call-after-offers <= 0.5 AND log_move_W-Call-incomplete-files > 0.5,29,23,6,0.2069
-balanced,21,4,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application <= 0.5 AND log_move_W-Validate-application <= 2.5,896,673,223,0.2489
-balanced,21,5,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application <= 0.5 AND log_move_W-Validate-application > 2.5,336,224,112,0.3333
-balanced,21,6,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application > 0.5 AND log_move_W-Assess-potential-fraud <= 3.5,760,637,123,0.1618
-balanced,21,7,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application > 0.5 AND log_move_W-Assess-potential-fraud > 3.5,34,20,14,0.4118
-balanced,21,8,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Call-after-offers > 1.5,45,45,0,0.0
-balanced,21,9,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application <= 0.5 AND log_move_O-Refused <= 1.5,125,94,31,0.248
-balanced,21,10,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application <= 0.5 AND log_move_O-Refused > 1.5,418,267,151,0.3612
-balanced,21,11,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application > 0.5,33,12,21,0.6364
-balanced,21,12,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused > 2.5,113,45,68,0.6018
+balanced,21,4,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application <= 0.5 AND log_move_W-Validate-application <= 2.5,896,673,223,0.2489
+balanced,21,5,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application <= 0.5 AND log_move_W-Validate-application > 2.5,336,224,112,0.3333
+balanced,21,6,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application > 0.5 AND log_move_W-Assess-potential-fraud <= 3.5,760,637,123,0.1618
+balanced,21,7,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application > 0.5 AND log_move_W-Assess-potential-fraud > 3.5,34,20,14,0.4118
+balanced,21,8,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer <= 0.5 AND model_move_W-Call-after-offers > 1.5,45,45,0,0.0
+balanced,21,9,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application <= 0.5 AND log_move_O-Refused <= 1.5,125,94,31,0.248
+balanced,21,10,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application <= 0.5 AND log_move_O-Refused > 1.5,418,267,151,0.3612
+balanced,21,11,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application > 0.5,33,12,21,0.6364
+balanced,21,12,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer > 0.5 AND log_move_O-Refused > 2.5,113,45,68,0.6018
 searched,14,0,bad,model_move_W-Call-after-offers <= 0.5,2661,1145,1516,0.5697
 searched,14,1,good,model_move_W-Call-after-offers > 0.5,432,356,76,0.1759
 searched,18,0,bad,model_move_W-Call-after-offers <= 0.5,2661,1674,987,0.3709
@@ -45,12 +45,12 @@ searched,21,0,good,log_move_W-Call-after-offers <= 0.5 AND log_move_W-Call-incom
 searched,21,1,good,log_move_W-Call-after-offers <= 0.5 AND log_move_W-Call-incomplete-files <= 0.5 AND model_move_W-Complete-application <= 0.5 AND log_move_O-Created > 0.5,29,29,0,0.0
 searched,21,2,good,log_move_W-Call-after-offers <= 0.5 AND log_move_W-Call-incomplete-files <= 0.5 AND model_move_W-Complete-application > 0.5,166,164,2,0.012
 searched,21,3,bad,log_move_W-Call-after-offers <= 0.5 AND log_move_W-Call-incomplete-files > 0.5,29,23,6,0.2069
-searched,21,4,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application <= 0.5 AND log_move_W-Validate-application <= 2.5,896,673,223,0.2489
-searched,21,5,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application <= 0.5 AND log_move_W-Validate-application > 2.5,336,224,112,0.3333
-searched,21,6,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application > 0.5 AND log_move_W-Assess-potential-fraud <= 3.5,760,637,123,0.1618
-searched,21,7,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application > 0.5 AND log_move_W-Assess-potential-fraud > 3.5,34,20,14,0.4118
-searched,21,8,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created <= 0.5 AND model_move_W-Call-after-offers > 1.5,45,45,0,0.0
-searched,21,9,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application <= 0.5 AND log_move_O-Refused <= 1.5,125,94,31,0.248
-searched,21,10,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application <= 0.5 AND log_move_O-Refused > 1.5,418,267,151,0.3612
-searched,21,11,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application > 0.5,33,12,21,0.6364
-searched,21,12,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Created > 0.5 AND log_move_O-Refused > 2.5,113,45,68,0.6018
+searched,21,4,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application <= 0.5 AND log_move_W-Validate-application <= 2.5,896,673,223,0.2489
+searched,21,5,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application <= 0.5 AND log_move_W-Validate-application > 2.5,336,224,112,0.3333
+searched,21,6,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application > 0.5 AND log_move_W-Assess-potential-fraud <= 3.5,760,637,123,0.1618
+searched,21,7,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer <= 0.5 AND model_move_W-Call-after-offers <= 1.5 AND model_move_W-Complete-application > 0.5 AND log_move_W-Assess-potential-fraud > 3.5,34,20,14,0.4118
+searched,21,8,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer <= 0.5 AND model_move_W-Call-after-offers > 1.5,45,45,0,0.0
+searched,21,9,good,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application <= 0.5 AND log_move_O-Refused <= 1.5,125,94,31,0.248
+searched,21,10,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application <= 0.5 AND log_move_O-Refused > 1.5,418,267,151,0.3612
+searched,21,11,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer > 0.5 AND log_move_O-Refused <= 2.5 AND log_move_W-Complete-application > 0.5,33,12,21,0.6364
+searched,21,12,bad,log_move_W-Call-after-offers > 0.5 AND log_move_O-Create-Offer > 0.5 AND log_move_O-Refused > 2.5,113,45,68,0.6018
