@@ -70,10 +70,10 @@ $$
 \kappa(\sigma) = t(\text{last event of }\sigma) - t(\text{first event of }\sigma).
 $$
 
-The artefact stores $\kappa(\sigma)$ in days as the case attribute `throughput_time`, and lower values are better. The implementation takes the earliest and the latest timestamp of the trace, which equals the definition for chronologically ordered traces. \bigskip
+The artefact stores $\kappa(\sigma)$ in days as the case attribute `throughput_time`, and lower values are better. The implementation takes the earliest and the latest timestamp of the trace, which equals the definition for chronologically ordered traces. 
+\bigskip
 
 \noindent
-
 **Step 2: Alignment and encoding:** The second step measures how each trace deviates from the Petri net. An alignment maps a trace onto a run of the net. Every position is a synchronous move (trace and model agree), a log move or a model move, as defined in [@sec-motivation; @Aalst16]. @tbl-align shows all three for a short trace.
 
 | Position | 1           | 2          | 3            | 4           |
@@ -89,18 +89,16 @@ An alignment is optimal when it has the minimal number of deviations on visible 
 Each alignment is then encoded as a vector of counts. For each of the 54 visible activities of the net, one feature records the number of model moves and one the number of log moves, as the brief specifies, giving 108 features per trace. An activity is an event name including its lifecycle suffix, for example `W-Call-after-offers-suspend`. Synchronous moves carry no deviation and are not features. The counts replace the activity sequence as representation, since the 3093 traces contain 2038 distinct sequences. \bigskip
 
 \noindent
-
 **Step 3: Classification:** The third step relates the encoded deviations to the KPI with a classification tree [@Dees2017]. The brief asks for a classification tree, so a trace is slow if its throughput time exceeds a cutoff of 14 days, and fast otherwise. The cutoff lies close to the median of 14.43 days, yields 1501 fast and 1592 slow traces, and was fixed before any tree was fitted. A rule therefore describes deviations that go with a throughput time above or below this cutoff. It does not show that they cause the delay or how large the delay is, and a different cutoff can give different rules, so @sec-evaluation compares three cutoffs.
 
 The tree is fitted on a stratified random sample of 75 percent of the traces, and the remaining 25 percent is held out for evaluation. A grid search with five-fold cross-validation on the training part selects the maximum depth (2 to 5), the minimum leaf size (5, 10 or 20) and the cost-complexity pruning parameter [@breiman1984classification] (0, 0.001, 0.01 or 0.1). This gives 48 combinations, and the grid was fixed before any scores were inspected. The selection criterion is the F1 score of the slow class. Pruning limits the number of rules. Unpruned trees produced at least twenty rules, which is too many to interpret. \bigskip
 
 \noindent
-
 **Step 4: Rules and trace subsets:** The fourth step reads the fitted tree as rules. Every path from the root to a leaf is a conjunction of threshold conditions on move counts, and each leaf is one rule. The counts are integers, so a condition such as `log_move_X <= 0.5` means that activity X never occurs as a log move, and `log_move_X > 0.5` means that it occurs at least once. A rule predicts the class that the tree assigns to its leaf. For each rule, the artefact lists the identifiers of all traces that satisfy its conditions, including those whose actual class differs from the predicted one. The rules and trace lists cover all 3093 traces, whereas precision and recall are computed on the hold-out set only.
 
 # Implementation
 
-The artefact is implemented in Python 3.12 in three packages that mirror the pipeline: data loading with KPI enrichment, alignment with encoding, and classification with rule extraction. PM4Py [@Berti2019] loads the XES log and the PNML net and computes the alignments, pandas holds the encoding table, and scikit-learn [@pedregosa2011scikit] fits the tree and performs the grid search. A single entry point, `src/main.py`, runs all four steps. It requires the cutoff in days and accepts the hold-out fraction, the random seed (default 0, so that a run is reproducible), an optional sample size for development and the output paths. It writes the encoding table, the rule table and the rule-to-trace assignments as CSV files, and `requirements.txt` lists the dependencies. Scripts in the `scripts` directory generate the two toy logs, compare their results with the hand-written gold standards, and compare cutoffs, seeds and lifecycle encodings on the real log ([Appendix](#sec-appendix)).
+The artefact is implemented in Python (3.12 or later) in three packages that mirror the pipeline: data loading with KPI enrichment, alignment with encoding, and classification with rule extraction. PM4Py [@Berti2019] loads the XES log and the PNML net and computes the alignments, pandas holds the encoding table, and scikit-learn [@pedregosa2011scikit] fits the tree and performs the grid search. A single entry point, `src/main.py`, runs all four steps. It requires the cutoff in days and accepts the hold-out fraction, the random seed of the split and the tree (default 0), an optional sample size for development and the output paths. It writes the encoding table, the rule table and the rule-to-trace assignments as CSV files, and `requirements.txt` lists the dependencies. Because the solver may return another optimal alignment for a few traces when run again, all reported results are computed from the stored encoding table, and `scripts/reproduce_all.py` regenerates them from it. Scripts in the `scripts` directory generate the two toy logs, compare their results with the hand-written gold standards, and compare cutoffs, seeds and lifecycle encodings on the real log ([Appendix](#sec-appendix)).
 
 # Evaluation Design and Results {#sec-evaluation}
 
@@ -165,7 +163,7 @@ On both toys, a tree of depth 1 fitted on the planted throughput times recovers 
 ![The two toy nets of the gold standards. Black boxes are silent transitions, which never appear in the log and are not features.](figures/toy_nets.png){#fig-toys width="90%"}
 
 | Trace | Deviation | Gold = aligner | Days | Slow |
-|:--------------|:--------------|:--------------|:-------------|:-------------|
+|:--------------|:------------------|:-------------------|:------|:-----|
 | t1: A B C | fits | none | 5 | no |
 | t2: A C | B missing | model move B | 8 | no |
 | t3: A B B C | extra B | log move B | 20 | yes |
@@ -185,7 +183,7 @@ On both toys, a tree of depth 1 fitted on the planted throughput times recovers 
 We tested whether the encoding of lifecycle events affects the results. The unmerged encoding has one feature per lifecycle variant (108 features). The pause/execution encoding sums the suspend and resume counts of each work task into one pause feature and the schedule, start and complete counts into one execution feature (74 features). The all merged encoding sums all lifecycle variants of a task, including `-ate-abort` and `-withdraw`, into one feature per move kind (46 features). The A- and O- activities are unchanged and the alignments are not recomputed. All encodings use the same cutoffs, seeds 0 to 3, grid and class weights. @tbl-merge shows the hold-out scores as mean ± standard deviation over four seeds, and the number of rules as mean (minimum to maximum). Pause/execution changes no F1 by more than one standard deviation; its 14-day uniform tree with seed 1 is a single rule that labels every trace as slow. All merged gives the same two-rule tree in every seed at 14 days with uniform weights (F1 0.713 ± 0.011), but it does not improve the other settings, and balanced weights at 21 days are slightly lower (0.444 against 0.460). We therefore do not consider any encoding better.
 
 | Cutoff | Weights | Encoding | Precision | Recall | F1 | Rules |
-|:----------|:----------|:----------|:----------|:----------|:----------|:----------|
+|:-------|:-------|:------------|:-----------|:----------|:-----------|:----------|
 | 14 days | uniform | unmerged | 0.582 ± 0.019 | 0.855 ± 0.133 | 0.688 ± 0.030 | 7.3 (2–14) |
 | 14 days | uniform | pause/execution | 0.560 ± 0.034 | 0.921 ± 0.119 | 0.692 ± 0.026 | 4.8 (1–14) |
 | 14 days | uniform | all merged | 0.571 ± 0.009 | 0.948 ± 0.017 | 0.713 ± 0.011 | 2.0 (2–2) |

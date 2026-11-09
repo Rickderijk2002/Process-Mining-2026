@@ -1,7 +1,8 @@
 """Variant of compare_cutoffs.py: merge ALL lifecycle variants of a W- task.
 
-Throw-away experiment, safe to delete: nothing else imports this file and the
-results go to their own files (cutoff_comparison_merged_all*.csv).
+Produces the "all merged" rows of the lifecycle merge table in the report
+appendix (step 6 of scripts/reproduce_all.py). Nothing else imports this file,
+and the results go to their own files (cutoff_comparison_merged_all*.csv).
 
 compare_cutoffs.py --merge keeps two features per task and move kind
 (pause = suspend + resume, execution = schedule + start + complete).
